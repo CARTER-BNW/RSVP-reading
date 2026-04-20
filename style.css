@@ -1,27 +1,42 @@
+/* ---------------------------------------------------------
+   GLOBAL
+--------------------------------------------------------- */
+
 * {
     box-sizing: border-box;
 }
 
 body {
+    margin: 0;
+    padding: 0;
     background: #1a1a1a;
     color: #ffffff;
     font-family: Arial, sans-serif;
-    margin: 0;
-    padding: 0;
+    overflow-x: hidden;
 }
 
-#container {
+#app {
     max-width: 900px;
     margin: 0 auto;
     padding: 20px;
 }
 
-h1 {
+/* ---------------------------------------------------------
+   DESKTOP TITLE
+--------------------------------------------------------- */
+
+#desktopTitle {
     text-align: center;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
-/* Text input */
+/* ---------------------------------------------------------
+   TEXT INPUT AREA
+--------------------------------------------------------- */
+
+#textSection {
+    margin-bottom: 20px;
+}
 
 textarea {
     width: 100%;
@@ -33,7 +48,9 @@ textarea {
     resize: vertical;
 }
 
-/* Buttons */
+/* ---------------------------------------------------------
+   BUTTONS
+--------------------------------------------------------- */
 
 button {
     background: #333333;
@@ -43,17 +60,16 @@ button {
     margin: 3px;
     cursor: pointer;
     font-size: 14px;
+    border-radius: 4px;
 }
 
 button:hover {
     background: #444444;
 }
 
-/* Controls */
-
-.controls {
-    margin-top: 10px;
-}
+/* ---------------------------------------------------------
+   CONTROL ROWS
+--------------------------------------------------------- */
 
 .row {
     display: flex;
@@ -67,7 +83,9 @@ button:hover {
     font-size: 14px;
 }
 
-/* Sliders and numeric inputs */
+/* ---------------------------------------------------------
+   SLIDERS + NUMBER INPUTS
+--------------------------------------------------------- */
 
 input[type="range"] {
     width: 200px;
@@ -82,7 +100,9 @@ input[type="number"] {
     border: 1px solid #444444;
 }
 
-/* Progress bar */
+/* ---------------------------------------------------------
+   PROGRESS BAR
+--------------------------------------------------------- */
 
 #progressContainer {
     width: 100%;
@@ -90,6 +110,7 @@ input[type="number"] {
     background: #333333;
     margin: 15px 0;
     overflow: hidden;
+    border-radius: 4px;
 }
 
 #progressBar {
@@ -98,19 +119,20 @@ input[type="number"] {
     background: #8888ff;
 }
 
-/* Display area */
+/* ---------------------------------------------------------
+   BIG WORD DISPLAY
+--------------------------------------------------------- */
 
 #displayArea {
     margin-top: 20px;
 }
-
-/* Big word with ORP centering */
 
 #bigWordContainer {
     position: relative;
     width: 100%;
     height: 140px;
     margin-bottom: 20px;
+    overflow: hidden;
 }
 
 #bigWordInner {
@@ -128,10 +150,118 @@ input[type="number"] {
     white-space: pre;
 }
 
-/* Inline context */
+#orpPart {
+    color: #ff4444;
+}
+
+/* ---------------------------------------------------------
+   INLINE CONTEXT
+--------------------------------------------------------- */
 
 #inlineContext {
     text-align: center;
     font-size: 18px;
     opacity: 0.85;
+}
+
+/* ---------------------------------------------------------
+   DESKTOP CONTROLS
+--------------------------------------------------------- */
+
+#desktopControls {
+    margin-bottom: 20px;
+}
+
+/* ---------------------------------------------------------
+   MOBILE CONTROLS (BOTTOM BAR)
+--------------------------------------------------------- */
+
+#mobileControls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111111;
+    border-top: 1px solid #333333;
+    display: none; /* hidden on desktop */
+    padding: 8px 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-around;
+}
+
+#mobileControls button {
+    font-size: 20px;
+    padding: 10px 14px;
+}
+
+/* ---------------------------------------------------------
+   SETTINGS DRAWER (MOBILE)
+--------------------------------------------------------- */
+
+#settingsDrawer {
+    position: fixed;
+    bottom: -400px; /* hidden */
+    left: 0;
+    width: 100%;
+    background: #222222;
+    border-top: 2px solid #444444;
+    padding: 20px;
+    z-index: 2000;
+    transition: transform 0.35s ease;
+    transform: translateY(100%);
+}
+
+#settingsDrawer.open {
+    transform: translateY(0%);
+}
+
+#settingsDrawer h2 {
+    margin-top: 0;
+    text-align: center;
+}
+
+.drawerRow {
+    margin: 12px 0;
+}
+
+.drawerRow label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.drawerRow input[type="range"] {
+    width: 100%;
+}
+
+.drawerRow button {
+    width: 48%;
+}
+
+/* ---------------------------------------------------------
+   RESPONSIVE BREAKPOINTS
+--------------------------------------------------------- */
+
+@media (max-width: 700px) {
+
+    /* Hide desktop UI */
+    #desktopControls,
+    #desktopTitle {
+        display: none;
+    }
+
+    /* Show mobile UI */
+    #mobileControls {
+        display: flex;
+    }
+
+    /* Shrink inline context */
+    #inlineContext {
+        font-size: 16px;
+    }
+
+    /* Reduce top padding */
+    #app {
+        padding-bottom: 120px; /* space for bottom bar */
+    }
 }
