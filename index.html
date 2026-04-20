@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>RSVP Reader</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div id="container">
+
+    <h1>RSVP Speed Reader</h1>
+
+    <!-- TEXT INPUT -->
+    <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+
+    <div class="row">
+        <button id="loadBtn">Load Text</button>
+        <button id="saveBtn">Save Text</button>
+    </div>
+
+    <!-- CONTROLS -->
+    <div class="controls">
+
+        <div class="row">
+            <button id="playBtn">Play</button>
+            <button id="pauseBtn">Pause</button>
+            <button id="restartBtn">Restart</button>
+            <button id="backBtn">⟵ 5s</button>
+            <button id="forwardBtn">5s ⟶</button>
+        </div>
+
+        <div class="row">
+            <label>WPM</label>
+            <input type="range" id="wpmSlider" min="100" max="1000" value="300">
+            <input type="number" id="wpmInput" value="300">
+        </div>
+
+        <div class="row">
+            <label>Word Size</label>
+            <input type="range" id="sizeSlider" min="20" max="96" value="48">
+        </div>
+
+        <div class="row">
+            <label>Chunk Size</label>
+            <input type="range" id="chunkSlider" min="1" max="3" value="1">
+        </div>
+
+        <div class="row">
+            <label><input type="checkbox" id="toggleBig" checked> Show big centered word</label>
+        </div>
+
+        <div class="row">
+            <label><input type="checkbox" id="toggleInline" checked> Show inline context</label>
+        </div>
+
+        <div class="row">
+            <button id="baseColorBtn">Text Color</button>
+            <button id="orpColorBtn">ORP Color</button>
+        </div>
+
+    </div>
+
+    <!-- PROGRESS BAR -->
+    <div id="progressContainer">
+        <div id="progressBar"></div>
+    </div>
+
+    <!-- DISPLAY AREA -->
+    <div id="displayArea">
+
+        <div id="bigWord">
+            <span id="leftPart"></span>
+            <span id="orpPart"></span>
+            <span id="rightPart"></span>
+        </div>
+
+        <div id="inlineContext"></div>
+
+    </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
