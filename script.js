@@ -13,6 +13,7 @@ const inputText = document.getElementById("inputText");
 const leftPart = document.getElementById("leftPart");
 const orpPart = document.getElementById("orpPart");
 const rightPart = document.getElementById("rightPart");
+const bigWordInner = document.getElementById("bigWordInner");
 const bigWordContainer = document.getElementById("bigWordContainer");
 
 const inlineContext = document.getElementById("inlineContext");
@@ -32,7 +33,7 @@ function orpIndex(word) {
     return Math.floor((word.length - 1) / 2);
 }
 
-// Prepare words from textarea
+// Prepare words
 function prepareWords() {
     const text = inputText.value.trim();
     if (!text) {
@@ -46,7 +47,7 @@ function prepareWords() {
     updateDisplay();
 }
 
-// Playback controls
+// Playback
 function play() {
     if (words.length === 0) prepareWords();
     if (words.length === 0) return;
@@ -81,7 +82,7 @@ function skip(seconds) {
     updateDisplay();
 }
 
-// Timing with punctuation slowdown
+// Timing
 function tick() {
     if (!running) return;
     if (index >= words.length) {
@@ -112,7 +113,7 @@ function tick() {
     timer = setTimeout(tick, interval);
 }
 
-// Main display update
+// Main display
 function updateDisplay() {
     if (words.length === 0) {
         leftPart.textContent = "";
@@ -151,23 +152,28 @@ function updateDisplay() {
     // Show/hide big word
     bigWordContainer.style.display = toggleBig.checked ? "block" : "none";
 
-    // Pixel-perfect centering of ORP
+    // Pixel-perfect ORP centering
     if (toggleBig.checked && pivot) {
-        // Force layout update
-        const containerWidth = bigWordContainer.clientWidth;
-        const centerX = containerWidth / 2;
+        // Force layout
+        const leftRect = leftPart.getBoundingClientRect();
+        const pivotRect = orpPart.getBoundingClientRect();
+        const containerRect = bigWordContainer.getBoundingClientRect();
 
-        const pivotWidth = orpPart.offsetWidth;
+        const leftWidth = leftRect.width;
+        const pivotWidth = pivotRect.width;
 
-        // ORP is already at 50% with translate(-50%, -50%)
+        // Distance from start of inner span to pivot center
+        const offset = leftWidth + pivotWidth / 2;
 
-        // Left: right-aligned, ends at centerX - pivotWidth/2
-        leftPart.style.left = (centerX - pivotWidth / 2) + "px";
-        leftPart.style.transform = "translate(-100%, -50%)";
+        // Center of container in pixels
+        const containerCenter = containerRect.width / 2;
 
-        // Right: left-aligned, starts at centerX + pivotWidth/2
-        rightPart.style.left = (centerX + pivotWidth / 2) + "px";
-        rightPart.style.transform = "translate(0, -50%)";
+        // Shift inner span so pivot center aligns with container center
+        const shift = containerCenter - offset;
+
+        bigWordInner.style.left = "0px";
+        bigWordInner.style.top = "50%";
+        bigWordInner.style.transform = `translate(${shift}px, -50%)`;
     }
 
     // Inline context
@@ -204,7 +210,7 @@ document.getElementById("restartBtn").onclick = restart;
 document.getElementById("backBtn").onclick = () => skip(-5);
 document.getElementById("forwardBtn").onclick = () => skip(5);
 
-// Color prompts
+// Colors
 document.getElementById("baseColorBtn").onclick = () => {
     const c = prompt("Enter text color (CSS or hex):", baseColor);
     if (c) {
@@ -221,7 +227,7 @@ document.getElementById("orpColorBtn").onclick = () => {
     }
 };
 
-// Load text from file
+// Load text
 document.getElementById("loadBtn").onclick = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -239,7 +245,7 @@ document.getElementById("loadBtn").onclick = () => {
     input.click();
 };
 
-// Save text to file
+// Save text
 document.getElementById("saveBtn").onclick = () => {
     const blob = new Blob([inputText.value], { type: "text/plain" });
     const a = document.createElement("a");
