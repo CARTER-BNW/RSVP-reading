@@ -220,29 +220,24 @@ function centerORP() {
     if (!orpPart.textContent) return;
 
     requestAnimationFrame(() => {
-        const leftWidth = leftPart.getBoundingClientRect().width;
-        const pivotWidth = orpPart.getBoundingClientRect().width;
-        const containerWidth = bigWordContainer.getBoundingClientRect().width;
+        const containerWidth = bigWordContainer.clientWidth;
+        if (!containerWidth) return;
 
-        if (containerWidth === 0) return;
-
-        const offset = leftWidth + pivotWidth / 2;
+        const pivotWidth = orpPart.offsetWidth;
         const center = containerWidth / 2;
-        const shift = center - offset;
 
-        bigWordInner.style.transform = `translate(${shift}px, -50%)`;
+        // ORP is already at 50% with translate(-50%, -50%)
 
-        requestAnimationFrame(() => {
-            const leftWidth2 = leftPart.getBoundingClientRect().width;
-            const pivotWidth2 = orpPart.getBoundingClientRect().width;
+        // Left: right-aligned, ends at center - pivotWidth/2
+        leftPart.style.left = (center - pivotWidth / 2) + "px";
+        leftPart.style.transform = "translate(-100%, -50%)";
 
-            const offset2 = leftWidth2 + pivotWidth2 / 2;
-            const shift2 = center - offset2;
-
-            bigWordInner.style.transform = `translate(${shift2}px, -50%)`;
-        });
+        // Right: left-aligned, starts at center + pivotWidth/2
+        rightPart.style.left = (center + pivotWidth / 2) + "px";
+        rightPart.style.transform = "translate(0, -50%)";
     });
 }
+
 
 /* ============================================================
    SYNC DESKTOP + MOBILE CONTROLS
