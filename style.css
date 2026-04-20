@@ -119,9 +119,7 @@ input[type="number"] {
     background: #8888ff;
 }
 
-/* ---------------------------------------------------------
-   BIG WORD DISPLAY
---------------------------------------------------------- */
+/* BIG WORD DISPLAY */
 
 #displayArea {
     margin-top: 20px;
@@ -135,27 +133,37 @@ input[type="number"] {
     overflow: hidden;
 }
 
-/* CRITICAL FIX — prevents 3-line wrapping */
+/* bigWordInner is just a positioning context now */
 #bigWordInner {
+    position: relative;
+    width: 100%;
+    height: 100%;
+}
+
+/* All three parts are absolutely positioned, no wrapping */
+#bigWordInner span {
     position: absolute;
     top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    display: inline-block;
+    transform: translateY(-50%);
     white-space: nowrap;
     font-family: Arial, sans-serif;
 }
 
-#leftPart,
-#orpPart,
-#rightPart {
-    display: inline-block;
-    white-space: nowrap;
+/* ORP letter: locked to visual center */
+#orpPart {
+    left: 50%;
+    transform: translate(-50%, -50%);
 }
 
-#orpPart {
-    color: #ff4444;
+/* Left/right alignment */
+#leftPart {
+    text-align: right;
 }
+
+#rightPart {
+    text-align: left;
+}
+
 
 /* ---------------------------------------------------------
    INLINE CONTEXT
