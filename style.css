@@ -135,19 +135,22 @@ input[type="number"] {
     overflow: hidden;
 }
 
+/* CRITICAL FIX — prevents 3-line wrapping */
 #bigWordInner {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    white-space: pre;
+    display: inline-block;
+    white-space: nowrap;
     font-family: Arial, sans-serif;
 }
 
 #leftPart,
 #orpPart,
 #rightPart {
-    white-space: pre;
+    display: inline-block;
+    white-space: nowrap;
 }
 
 #orpPart {
@@ -186,7 +189,6 @@ input[type="number"] {
     display: none; /* hidden on desktop */
     padding: 8px 0;
     z-index: 1000;
-    display: flex;
     justify-content: space-around;
 }
 
@@ -201,15 +203,15 @@ input[type="number"] {
 
 #settingsDrawer {
     position: fixed;
-    bottom: -400px; /* hidden */
+    bottom: 0;
     left: 0;
     width: 100%;
     background: #222222;
     border-top: 2px solid #444444;
     padding: 20px;
     z-index: 2000;
-    transition: transform 0.35s ease;
     transform: translateY(100%);
+    transition: transform 0.35s ease;
 }
 
 #settingsDrawer.open {
@@ -260,8 +262,8 @@ input[type="number"] {
         font-size: 16px;
     }
 
-    /* Reduce top padding */
+    /* Space for bottom bar */
     #app {
-        padding-bottom: 120px; /* space for bottom bar */
+        padding-bottom: 120px;
     }
 }
