@@ -223,15 +223,15 @@ function centerORP() {
         const pivotWidth = orpPart.offsetWidth;
         const containerWidth = bigWordContainer.clientWidth;
 
-        const pivotCenterFromStart = leftWidth + pivotWidth / 2;
+        const pivotCenter = leftWidth + pivotWidth / 2;
         const containerCenter = containerWidth / 2;
 
-        const shift = containerCenter - pivotCenterFromStart;
+        const shift = containerCenter - pivotCenter;
 
-        // Move the whole word so the pivot sits exactly in the center
         bigWordInner.style.left = shift + "px";
     });
 }
+
 
 
 
