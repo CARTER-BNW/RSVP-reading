@@ -223,20 +223,18 @@ function centerORP() {
         const containerWidth = bigWordContainer.clientWidth;
         if (!containerWidth) return;
 
-        const pivotWidth = orpPart.offsetWidth;
-        const center = containerWidth / 2;
+        const leftWidth = leftPart.getBoundingClientRect().width;
+        const pivotWidth = orpPart.getBoundingClientRect().width;
 
-        // ORP is already at 50% with translate(-50%, -50%)
+        const offset = leftWidth + pivotWidth / 2;          // pivot center from start of word
+        const center = containerWidth / 2;                  // visual center of container
+        const shift = center - offset;                      // how much to move the whole word
 
-        // Left: right-aligned, ends at center - pivotWidth/2
-        leftPart.style.left = (center - pivotWidth / 2) + "px";
-        leftPart.style.transform = "translate(-100%, -50%)";
-
-        // Right: left-aligned, starts at center + pivotWidth/2
-        rightPart.style.left = (center + pivotWidth / 2) + "px";
-        rightPart.style.transform = "translate(0, -50%)";
+        // Move the entire word horizontally so pivot center hits container center
+        bigWordInner.style.left = shift + "px";
     });
 }
+
 
 
 /* ============================================================
