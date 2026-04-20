@@ -216,24 +216,23 @@ function updateDisplay() {
 ============================================================ */
 
 function centerORP() {
-    if (!toggleBig.checked) return;
     if (!orpPart.textContent) return;
 
     requestAnimationFrame(() => {
+        const leftWidth = leftPart.offsetWidth;
+        const pivotWidth = orpPart.offsetWidth;
         const containerWidth = bigWordContainer.clientWidth;
-        if (!containerWidth) return;
 
-        const leftWidth = leftPart.getBoundingClientRect().width;
-        const pivotWidth = orpPart.getBoundingClientRect().width;
+        const pivotCenterFromStart = leftWidth + pivotWidth / 2;
+        const containerCenter = containerWidth / 2;
 
-        const offset = leftWidth + pivotWidth / 2;          // pivot center from start of word
-        const center = containerWidth / 2;                  // visual center of container
-        const shift = center - offset;                      // how much to move the whole word
+        const shift = containerCenter - pivotCenterFromStart;
 
-        // Move the entire word horizontally so pivot center hits container center
+        // Move the whole word so the pivot sits exactly in the center
         bigWordInner.style.left = shift + "px";
     });
 }
+
 
 
 
