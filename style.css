@@ -1,5 +1,3 @@
-/* Global layout */
-
 * {
     box-sizing: border-box;
 }
@@ -17,8 +15,6 @@ body {
     margin: 0 auto;
     padding: 20px;
 }
-
-/* Header */
 
 h1 {
     text-align: center;
@@ -53,7 +49,11 @@ button:hover {
     background: #444444;
 }
 
-/* Rows / controls */
+/* Controls */
+
+.controls {
+    margin-top: 10px;
+}
 
 .row {
     display: flex;
@@ -104,7 +104,7 @@ input[type="number"] {
     margin-top: 20px;
 }
 
-/* Big word container with pixel-perfect ORP centering */
+/* Big word with ORP centering */
 
 #bigWordContainer {
     position: relative;
@@ -113,29 +113,19 @@ input[type="number"] {
     margin-bottom: 20px;
 }
 
-#bigWordContainer span {
+#bigWordInner {
     position: absolute;
     top: 50%;
-    transform: translateY(-50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
     white-space: pre;
     font-family: Arial, sans-serif;
 }
 
-/* ORP letter: always centered */
-
-#orpPart {
-    left: 50%;
-    transform: translate(-50%, -50%);
-}
-
-/* Left/right text alignment */
-
-#leftPart {
-    text-align: right;
-}
-
+#leftPart,
+#orpPart,
 #rightPart {
-    text-align: left;
+    white-space: pre;
 }
 
 /* Inline context */
@@ -144,10 +134,4 @@ input[type="number"] {
     text-align: center;
     font-size: 18px;
     opacity: 0.85;
-}
-
-/* Utility */
-
-.controls {
-    margin-top: 10px;
 }
