@@ -1,4 +1,7 @@
-// State
+/* ============================================================
+   GLOBAL STATE
+============================================================ */
+
 let words = [];
 let index = 0;
 let running = false;
@@ -7,7 +10,10 @@ let timer = null;
 let baseColor = "#ffffff";
 let orpColor = "#ff4444";
 
-// Elements
+/* ============================================================
+   ELEMENT REFERENCES
+============================================================ */
+
 const inputText = document.getElementById("inputText");
 
 const leftPart = document.getElementById("leftPart");
@@ -28,12 +34,38 @@ const toggleInline = document.getElementById("toggleInline");
 
 const progressBar = document.getElementById("progressBar");
 
-// ORP index
+/* MOBILE CONTROLS */
+const mPlay = document.getElementById("mPlay");
+const mPause = document.getElementById("mPause");
+const mBack = document.getElementById("mBack");
+const mForward = document.getElementById("mForward");
+const mRestart = document.getElementById("mRestart");
+const mSettings = document.getElementById("mSettings");
+
+/* SETTINGS DRAWER */
+const drawer = document.getElementById("settingsDrawer");
+
+const d_wpmSlider = document.getElementById("d_wpmSlider");
+const d_wpmInput = document.getElementById("d_wpmInput");
+const d_sizeSlider = document.getElementById("d_sizeSlider");
+const d_chunkSlider = document.getElementById("d_chunkSlider");
+const d_toggleBig = document.getElementById("d_toggleBig");
+const d_toggleInline = document.getElementById("d_toggleInline");
+const d_baseColorBtn = document.getElementById("d_baseColorBtn");
+const d_orpColorBtn = document.getElementById("d_orpColorBtn");
+
+/* ============================================================
+   ORP INDEX
+============================================================ */
+
 function orpIndex(word) {
     return Math.floor((word.length - 1) / 2);
 }
 
-// Prepare words
+/* ============================================================
+   PREPARE WORDS
+============================================================ */
+
 function prepareWords() {
     const text = inputText.value.trim();
     if (!text) {
@@ -47,7 +79,10 @@ function prepareWords() {
     updateDisplay();
 }
 
-// Playback
+/* ============================================================
+   PLAYBACK CONTROLS
+============================================================ */
+
 function play() {
     if (words.length === 0) prepareWords();
     if (words.length === 0) return;
@@ -82,7 +117,10 @@ function skip(seconds) {
     updateDisplay();
 }
 
-// Timing
+/* ============================================================
+   TICK (WORD ADVANCE)
+============================================================ */
+
 function tick() {
     if (!running) return;
     if (index >= words.length) {
@@ -94,6 +132,7 @@ function tick() {
 
     const chunkSize = Number(chunkSlider.value);
     index += chunkSize;
+
     if (index >= words.length) {
         index = words.length;
         updateDisplay();
@@ -113,7 +152,10 @@ function tick() {
     timer = setTimeout(tick, interval);
 }
 
-// Main display
+/* ============================================================
+   MAIN DISPLAY UPDATE
+============================================================ */
+
 function updateDisplay() {
     if (words.length === 0) {
         leftPart.textContent = "";
@@ -138,45 +180,24 @@ function updateDisplay() {
     orpPart.textContent = pivot;
     rightPart.textContent = right;
 
-    // Colors
+    /* Colors */
     leftPart.style.color = baseColor;
     rightPart.style.color = baseColor;
     orpPart.style.color = orpColor;
 
-    // Font size
+    /* Font size */
     const size = sizeSlider.value + "px";
     leftPart.style.fontSize = size;
     orpPart.style.fontSize = size;
     rightPart.style.fontSize = size;
 
-    // Show/hide big word
+    /* Show/hide big word */
     bigWordContainer.style.display = toggleBig.checked ? "block" : "none";
 
-    // Pixel-perfect ORP centering
-    if (toggleBig.checked && pivot) {
-        // Force layout
-        const leftRect = leftPart.getBoundingClientRect();
-        const pivotRect = orpPart.getBoundingClientRect();
-        const containerRect = bigWordContainer.getBoundingClientRect();
+    /* Pixel-perfect ORP centering */
+    centerORP();
 
-        const leftWidth = leftRect.width;
-        const pivotWidth = pivotRect.width;
-
-        // Distance from start of inner span to pivot center
-        const offset = leftWidth + pivotWidth / 2;
-
-        // Center of container in pixels
-        const containerCenter = containerRect.width / 2;
-
-        // Shift inner span so pivot center aligns with container center
-        const shift = containerCenter - offset;
-
-        bigWordInner.style.left = "0px";
-        bigWordInner.style.top = "50%";
-        bigWordInner.style.transform = `translate(${shift}px, -50%)`;
-    }
-
-    // Inline context
+    /* Inline context */
     if (toggleInline.checked) {
         const prev = words[idx - 1] || "";
         const next = words[idx + chunkSize] || "";
@@ -186,13 +207,135 @@ function updateDisplay() {
         inlineContext.style.display = "none";
     }
 
-    // Progress
+    /* Progress */
     progressBar.style.width = (idx / words.length) * 100 + "%";
 }
 
-// WPM sync
+/* ============================================================
+   ORP CENTERING ENGINE (DOUBLE RAF)
+============================================================ */
+
+function centerORP() {
+    if (!toggleBig.checked) return;
+    if (!orpPart.textContent) return;
+
+    requestAnimationFrame(() => {
+        const leftWidth = leftPart.getBoundingClientRect().width;
+        const pivotWidth = orpPart.getBoundingClientRect().width;
+        const containerWidth = bigWordContainer.getBoundingClientRect().width;
+
+        if (containerWidth === 0) return;
+
+        const offset = leftWidth + pivotWidth / 2;
+        const center = containerWidth / 2;
+        const shift = center - offset;
+
+        bigWordInner.style.transform = `translate(${shift}px, -50%)`;
+
+        requestAnimationFrame(() => {
+            const leftWidth2 = leftPart.getBoundingClientRect().width;
+            const pivotWidth2 = orpPart.getBoundingClientRect().width;
+
+            const offset2 = leftWidth2 + pivotWidth2 / 2;
+            const shift2 = center - offset2;
+
+            bigWordInner.style.transform = `translate(${shift2}px, -50%)`;
+        });
+    });
+}
+
+/* ============================================================
+   SYNC DESKTOP + MOBILE CONTROLS
+============================================================ */
+
+function syncToMobile() {
+    d_wpmSlider.value = wpmSlider.value;
+    d_wpmInput.value = wpmInput.value;
+    d_sizeSlider.value = sizeSlider.value;
+    d_chunkSlider.value = chunkSlider.value;
+    d_toggleBig.checked = toggleBig.checked;
+    d_toggleInline.checked = toggleInline.checked;
+}
+
+function syncToDesktop() {
+    wpmSlider.value = d_wpmSlider.value;
+    wpmInput.value = d_wpmInput.value;
+    sizeSlider.value = d_sizeSlider.value;
+    chunkSlider.value = d_chunkSlider.value;
+    toggleBig.checked = d_toggleBig.checked;
+    toggleInline.checked = d_toggleInline.checked;
+    updateDisplay();
+}
+
+/* ============================================================
+   SETTINGS DRAWER
+============================================================ */
+
+mSettings.onclick = () => {
+    syncToMobile();
+    drawer.classList.add("open");
+};
+
+drawer.onclick = (e) => {
+    if (e.target === drawer) drawer.classList.remove("open");
+};
+
+/* Close drawer when tapping outside */
+document.addEventListener("click", (e) => {
+    if (!drawer.contains(e.target) && e.target !== mSettings) {
+        drawer.classList.remove("open");
+    }
+});
+
+/* Drawer controls update desktop controls */
+d_wpmSlider.oninput = () => {
+    d_wpmInput.value = d_wpmSlider.value;
+    syncToDesktop();
+};
+d_wpmInput.onchange = () => {
+    d_wpmSlider.value = d_wpmInput.value;
+    syncToDesktop();
+};
+
+d_sizeSlider.oninput = () => {
+    syncToDesktop();
+};
+
+d_chunkSlider.oninput = () => {
+    syncToDesktop();
+};
+
+d_toggleBig.onchange = () => {
+    syncToDesktop();
+};
+
+d_toggleInline.onchange = () => {
+    syncToDesktop();
+};
+
+d_baseColorBtn.onclick = () => {
+    const c = prompt("Enter text color:", baseColor);
+    if (c) {
+        baseColor = c;
+        updateDisplay();
+    }
+};
+
+d_orpColorBtn.onclick = () => {
+    const c = prompt("Enter ORP color:", orpColor);
+    if (c) {
+        orpColor = c;
+        updateDisplay();
+    }
+};
+
+/* ============================================================
+   DESKTOP CONTROLS
+============================================================ */
+
 wpmSlider.oninput = () => {
     wpmInput.value = wpmSlider.value;
+    updateDisplay();
 };
 
 wpmInput.onchange = () => {
@@ -201,33 +344,35 @@ wpmInput.onchange = () => {
     v = Math.max(50, Math.min(2000, v));
     wpmSlider.value = v;
     wpmInput.value = v;
+    updateDisplay();
 };
 
-// Buttons
+sizeSlider.oninput = updateDisplay;
+chunkSlider.oninput = updateDisplay;
+toggleBig.onchange = updateDisplay;
+toggleInline.onchange = updateDisplay;
+
+/* ============================================================
+   BUTTONS
+============================================================ */
+
 document.getElementById("playBtn").onclick = play;
 document.getElementById("pauseBtn").onclick = pause;
 document.getElementById("restartBtn").onclick = restart;
 document.getElementById("backBtn").onclick = () => skip(-5);
 document.getElementById("forwardBtn").onclick = () => skip(5);
 
-// Colors
-document.getElementById("baseColorBtn").onclick = () => {
-    const c = prompt("Enter text color (CSS or hex):", baseColor);
-    if (c) {
-        baseColor = c;
-        updateDisplay();
-    }
-};
+/* MOBILE BUTTONS */
+mPlay.onclick = play;
+mPause.onclick = pause;
+mRestart.onclick = restart;
+mBack.onclick = () => skip(-5);
+mForward.onclick = () => skip(5);
 
-document.getElementById("orpColorBtn").onclick = () => {
-    const c = prompt("Enter ORP color (CSS or hex):", orpColor);
-    if (c) {
-        orpColor = c;
-        updateDisplay();
-    }
-};
+/* ============================================================
+   LOAD / SAVE TEXT
+============================================================ */
 
-// Load text
 document.getElementById("loadBtn").onclick = () => {
     const input = document.createElement("input");
     input.type = "file";
@@ -245,7 +390,6 @@ document.getElementById("loadBtn").onclick = () => {
     input.click();
 };
 
-// Save text
 document.getElementById("saveBtn").onclick = () => {
     const blob = new Blob([inputText.value], { type: "text/plain" });
     const a = document.createElement("a");
@@ -254,11 +398,10 @@ document.getElementById("saveBtn").onclick = () => {
     a.click();
 };
 
-// Toggles
-toggleBig.onchange = () => updateDisplay();
-toggleInline.onchange = () => updateDisplay();
+/* ============================================================
+   KEYBOARD SHORTCUTS
+============================================================ */
 
-// Keyboard shortcuts
 document.addEventListener("keydown", e => {
     if (e.code === "Space") {
         e.preventDefault();
@@ -272,5 +415,15 @@ document.addEventListener("keydown", e => {
     }
 });
 
-// Initial
+/* ============================================================
+   RESIZE + ORIENTATION FIXES
+============================================================ */
+
+window.addEventListener("resize", centerORP);
+window.addEventListener("orientationchange", centerORP);
+
+/* ============================================================
+   INITIAL RENDER
+============================================================ */
+
 updateDisplay();
