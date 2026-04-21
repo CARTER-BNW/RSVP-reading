@@ -9,9 +9,6 @@ let timer = null;
 let wpm = 300;
 let wordSize = 48;
 
-let baseColor = "#ffffff";
-let orpColor = "#ff4444";
-
 let showBig = true;
 let showInline = true;
 
@@ -21,11 +18,7 @@ let showInline = true;
 //------------------------------------------------------------
 const inputText = document.getElementById("inputText");
 
-const leftPart = document.getElementById("leftPart");
-const orpPart = document.getElementById("orpPart");
-const rightPart = document.getElementById("rightPart");
-
-const bigWordInner = document.getElementById("bigWordInner");
+const bigWordSpan = document.getElementById("bigWord");
 const bigWordContainer = document.getElementById("bigWordContainer");
 const inlineContext = document.getElementById("inlineContext");
 
@@ -45,9 +38,6 @@ const sizeSlider = document.getElementById("sizeSlider");
 
 const toggleBig = document.getElementById("toggleBig");
 const toggleInline = document.getElementById("toggleInline");
-
-const baseColorBtn = document.getElementById("baseColorBtn");
-const orpColorBtn = document.getElementById("orpColorBtn");
 
 
 //------------------------------------------------------------
@@ -72,54 +62,23 @@ function prepareWords() {
 
 
 //------------------------------------------------------------
-// ORP LOGIC
-//------------------------------------------------------------
-function getOrpIndex(word) {
-    if (word.length <= 1) return 0;
-    if (word.length <= 5) return 1;
-    if (word.length <= 9) return 2;
-    return 3;
-}
-
-function centerORP() {
-    const containerRect = bigWordContainer.getBoundingClientRect();
-    const orpRect = orpPart.getBoundingClientRect();
-
-    const containerCenter = containerRect.left + containerRect.width / 2;
-    const orpCenter = orpRect.left + orpRect.width / 2;
-
-    const delta = containerCenter - orpCenter;
-
-    const currentLeft = parseFloat(getComputedStyle(bigWordInner).left) || 0;
-    bigWordInner.style.left = `${currentLeft + delta}px`;
-}
-
-
-//------------------------------------------------------------
 // DISPLAY
 //------------------------------------------------------------
 function updateDisplay() {
     if (!words.length) {
-        leftPart.textContent = "";
-        orpPart.textContent = "";
-        rightPart.textContent = "";
+        bigWordSpan.textContent = "";
         inlineContext.textContent = "";
         return;
     }
 
     const word = words[index];
-    const orpIdx = getOrpIndex(word);
 
-    leftPart.textContent = word.slice(0, orpIdx);
-    orpPart.textContent = word.charAt(orpIdx);
-    rightPart.textContent = word.slice(orpIdx + 1);
+    // Big word
+    bigWordSpan.textContent = word;
+    bigWordSpan.style.fontSize = wordSize + "px";
+    bigWordContainer.style.display = showBig ? "flex" : "none";
 
-    bigWordInner.style.fontSize = wordSize + "px";
-    bigWordInner.style.color = baseColor;
-    orpPart.style.color = orpColor;
-
-    bigWordContainer.style.display = showBig ? "block" : "none";
-
+    // Inline context
     if (showInline) {
         const start = Math.max(0, index - 5);
         const end = Math.min(words.length, index + 6);
@@ -128,9 +87,6 @@ function updateDisplay() {
     } else {
         inlineContext.style.display = "none";
     }
-
-    bigWordInner.style.left = "0px";
-    requestAnimationFrame(centerORP);
 }
 
 
@@ -247,26 +203,9 @@ toggleInline.addEventListener("change", () => {
     updateDisplay();
 });
 
-baseColorBtn.addEventListener("click", () => {
-    const c = prompt("Base text color:", baseColor);
-    if (c) {
-        baseColor = c;
-        updateDisplay();
-    }
-});
-
-orpColorBtn.addEventListener("click", () => {
-    const c = prompt("ORP color:", orpColor);
-    if (c) {
-        orpColor = c;
-        updateDisplay();
-    }
-});
-
 
 //------------------------------------------------------------
 // INIT
 //------------------------------------------------------------
-prepareWords();
 updateDisplay();
 updateProgress();
