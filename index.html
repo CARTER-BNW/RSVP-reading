@@ -12,66 +12,68 @@
 
     <h1>RSVP Speed Reader</h1>
 
-    <div id="textSection">
-        <textarea id="inputText" placeholder="Paste your text here..."></textarea>
-        <div class="row">
-            <button id="loadBtn">Load Text</button>
-            <button id="saveBtn">Save Text</button>
-        </div>
+    <textarea id="inputText" placeholder="Paste your text here..."></textarea>
+
+    <div class="row">
+        <button id="loadBtn">Load Text</button>
+        <button id="saveBtn">Save Text</button>
     </div>
 
     <div id="progressContainer">
         <div id="progressBar"></div>
     </div>
 
-    <div id="displayArea">
-        <div id="bigWordContainer">
-            <div id="bigWordInner">
-                <span id="leftPart"></span>
-                <span id="orpPart"></span>
-                <span id="rightPart"></span>
-            </div>
+    <div id="bigWordContainer">
+        <div id="bigWordInner">
+            <span id="leftPart"></span>
+            <span id="orpPart"></span>
+            <span id="rightPart"></span>
         </div>
-        <div id="inlineContext"></div>
     </div>
 
+    <div id="inlineContext"></div>
+
 </div>
 
-<div id="mobileControls">
-    <button id="mPlay">▶</button>
-    <button id="mPause">⏸</button>
-    <button id="mBack">⟵5</button>
-    <button id="mForward">5⟶</button>
-    <button id="mRestart">⟳</button>
-    <button id="mSettings">⚙</button>
+<!-- SINGLE CONTROL BAR (DESKTOP + MOBILE) -->
+<div id="controlsBar">
+    <button id="playBtn">▶</button>
+    <button id="pauseBtn">⏸</button>
+    <button id="backBtn">⟵5</button>
+    <button id="forwardBtn">5⟶</button>
+    <button id="restartBtn">⟳</button>
+    <button id="settingsBtn">⚙</button>
 </div>
 
+<!-- SETTINGS DRAWER -->
 <div id="settingsDrawer">
+
     <h2>Settings</h2>
 
     <div class="drawerRow">
         <label>WPM</label>
-        <input type="range" id="d_wpmSlider" min="100" max="1000" value="300">
-        <input type="number" id="d_wpmInput" value="300">
+        <input type="range" id="wpmSlider" min="100" max="1000" value="300">
+        <input type="number" id="wpmInput" value="300">
     </div>
 
     <div class="drawerRow">
         <label>Word Size</label>
-        <input type="range" id="d_sizeSlider" min="20" max="96" value="48">
+        <input type="range" id="sizeSlider" min="20" max="96" value="48">
     </div>
 
     <div class="drawerRow">
-        <label><input type="checkbox" id="d_toggleBig" checked> Show big centered word</label>
+        <label><input type="checkbox" id="toggleBig" checked> Show big centered word</label>
     </div>
 
     <div class="drawerRow">
-        <label><input type="checkbox" id="d_toggleInline" checked> Show inline context</label>
+        <label><input type="checkbox" id="toggleInline" checked> Show inline context</label>
     </div>
 
     <div class="drawerRow">
-        <button id="d_baseColorBtn">Text Color</button>
-        <button id="d_orpColorBtn">ORP Color</button>
+        <button id="baseColorBtn">Text Color</button>
+        <button id="orpColorBtn">ORP Color</button>
     </div>
+
 </div>
 
 <script src="script.js"></script>
