@@ -52,16 +52,19 @@ const toggleInline = document.getElementById("toggleInline");
 const baseColorBtn = document.getElementById("baseColorBtn");
 const orpColorBtn = document.getElementById("orpColorBtn");
 
+const loadBtn = document.getElementById("loadBtn");
+const saveBtn = document.getElementById("saveBtn");
+
 
 //------------------------------------------------------------
 // LOAD / SAVE
 //------------------------------------------------------------
-document.getElementById("loadBtn").addEventListener("click", () => {
+loadBtn.addEventListener("click", () => {
     inputText.value = localStorage.getItem("rsvp_text") || "";
     prepareWords();
 });
 
-document.getElementById("saveBtn").addEventListener("click", () => {
+saveBtn.addEventListener("click", () => {
     localStorage.setItem("rsvp_text", inputText.value || "");
 });
 
@@ -243,17 +246,17 @@ settingsBtn.addEventListener("click", () => {
 // SETTINGS EVENTS
 //------------------------------------------------------------
 wpmSlider.addEventListener("input", () => {
-    wpm = parseInt(wpmSlider.value, 10);
+    wpm = parseInt(wpmSlider.value, 10) || 300;
     wpmInput.value = wpm;
 });
 
 wpmInput.addEventListener("input", () => {
-    wpm = parseInt(wpmInput.value, 10);
+    wpm = parseInt(wpmInput.value, 10) || 300;
     wpmSlider.value = wpm;
 });
 
 sizeSlider.addEventListener("input", () => {
-    wordSize = parseInt(sizeSlider.value, 10);
+    wordSize = parseInt(sizeSlider.value, 10) || 48;
     updateDisplay();
 });
 
