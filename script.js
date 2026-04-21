@@ -9,8 +9,8 @@ let timer = null;
 let wpm = 300;
 let wordSize = 48;
 
-let showBig = true;
-let showInline = true;
+let baseColor = "#ffffff";
+let orpColor = "#ff4444";
 
 
 //------------------------------------------------------------
@@ -18,13 +18,14 @@ let showInline = true;
 //------------------------------------------------------------
 const inputText = document.getElementById("inputText");
 
-const bigWordContainer = document.getElementById("bigWordContainer");
-const inlineContext = document.getElementById("inlineContext");
-
 const leftPart = document.getElementById("leftPart");
 const orpPart = document.getElementById("orpPart");
 const rightPart = document.getElementById("rightPart");
 
+const bigWordInner = document.getElementById("bigWordInner");
+const bigWordContainer = document.getElementById("bigWordContainer");
+
+const inlineContext = document.getElementById("inlineContext");
 const progressBar = document.getElementById("progressBar");
 
 // Controls
@@ -39,8 +40,8 @@ const wpmSlider = document.getElementById("wpmSlider");
 const wpmInput = document.getElementById("wpmInput");
 const sizeSlider = document.getElementById("sizeSlider");
 
-const toggleBig = document.getElementById("toggleBig");
-const toggleInline = document.getElementById("toggleInline");
+const baseColorPicker = document.getElementById("baseColorPicker");
+const orpColorPicker = document.getElementById("orpColorPicker");
 
 
 //------------------------------------------------------------
@@ -59,7 +60,6 @@ function getOrpIndex(word) {
 //------------------------------------------------------------
 function prepareWords() {
     const text = inputText.value.trim();
-
     if (!text) {
         words = [];
         index = 0;
@@ -92,23 +92,43 @@ function updateDisplay() {
     orpPart.textContent = word.charAt(orpIdx);
     rightPart.textContent = word.slice(orpIdx + 1);
 
-    // Apply size
     leftPart.style.fontSize = wordSize + "px";
     orpPart.style.fontSize = wordSize + "px";
     rightPart.style.fontSize = wordSize + "px";
 
-    // Big word toggle
-    bigWordContainer.style.display = showBig ? "flex" : "none";
+    leftPart.style.color = baseColor;
+    rightPart.style.color = baseColor;
+    orpPart.style.color = orpColor;
 
-    // Inline context
-    if (showInline) {
-        const start = Math.max(0, index - 5);
-        const end = Math.min(words.length, index + 6);
-        inlineContext.textContent = words.slice(start, end).join(" ");
-        inlineContext.style.display = "block";
-    } else {
-        inlineContext.style.display = "none";
-    }
+    // Inline context with highlight
+    const start = Math.max(0, index - 5);
+    const end = Math.min(words.length, index + 6);
+
+    inlineContext.innerHTML = words
+        .slice(start, end)
+        .map((w, i) => {
+            const globalIndex = start + i;
+            if (globalIndex === index) {
+                return `<span style="color:${orpColor}; font-weight:bold;">${w}</span>`;
+            }
+            return w;
+        })
+        .join(" ");
+
+    inlineContext.style.display = "block";
+
+    // Column lock: center ORP letter
+    bigWordInner.style.left = "0px";
+    requestAnimationFrame(() => {
+        const container = bigWordContainer.getBoundingClientRect();
+        const orpRect = orpPart.getBoundingClientRect();
+
+        const containerCenter = container.left + container.width / 2;
+        const orpCenter = orpRect.left + orpRect.width / 2;
+
+        const delta = containerCenter - orpCenter;
+        bigWordInner.style.left = `${delta}px`;
+    });
 }
 
 
@@ -148,8 +168,7 @@ function tick() {
 }
 
 function play() {
-    // ⭐ ALWAYS reload text when Play is pressed
-    prepareWords();
+    prepareWords(); // ALWAYS reload text
 
     if (!words.length) return;
 
@@ -172,7 +191,7 @@ function stop() {
 
 
 //------------------------------------------------------------
-// CONTROL BAR EVENTS
+// CONTROL EVENTS
 //------------------------------------------------------------
 playBtn.addEventListener("click", play);
 pauseBtn.addEventListener("click", stop);
@@ -217,13 +236,13 @@ sizeSlider.addEventListener("input", () => {
     updateDisplay();
 });
 
-toggleBig.addEventListener("change", () => {
-    showBig = toggleBig.checked;
+baseColorPicker.addEventListener("input", () => {
+    baseColor = baseColorPicker.value;
     updateDisplay();
 });
 
-toggleInline.addEventListener("change", () => {
-    showInline = toggleInline.checked;
+orpColorPicker.addEventListener("input", () => {
+    orpColor = orpColorPicker.value;
     updateDisplay();
 });
 
