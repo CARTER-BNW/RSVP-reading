@@ -37,11 +37,8 @@ const pauseBtn = document.getElementById("pauseBtn");
 const backBtn = document.getElementById("backBtn");
 const forwardBtn = document.getElementById("forwardBtn");
 const restartBtn = document.getElementById("restartBtn");
-const settingsBtn = document.getElementById("settingsBtn");
 
-// Drawer
-const settingsDrawer = document.getElementById("settingsDrawer");
-
+// Settings
 const wpmSlider = document.getElementById("wpmSlider");
 const wpmInput = document.getElementById("wpmInput");
 const sizeSlider = document.getElementById("sizeSlider");
@@ -235,10 +232,6 @@ forwardBtn.addEventListener("click", () => {
     index = Math.min(words.length - 1, index + jump);
     updateDisplay();
     updateProgress();
-});
-
-settingsBtn.addEventListener("click", () => {
-    settingsDrawer.classList.toggle("open");
 });
 
 
