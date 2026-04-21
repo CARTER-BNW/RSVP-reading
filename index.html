@@ -33,6 +33,37 @@
 
     <div id="inlineContext"></div>
 
+    <!-- SETTINGS ALWAYS VISIBLE -->
+    <div id="settingsPanel">
+
+        <h2>Settings</h2>
+
+        <div class="drawerRow">
+            <label>WPM</label>
+            <input type="range" id="wpmSlider" min="100" max="1000" value="300">
+            <input type="number" id="wpmInput" value="300">
+        </div>
+
+        <div class="drawerRow">
+            <label>Word Size</label>
+            <input type="range" id="sizeSlider" min="20" max="96" value="48">
+        </div>
+
+        <div class="drawerRow">
+            <label><input type="checkbox" id="toggleBig" checked> Show big centered word</label>
+        </div>
+
+        <div class="drawerRow">
+            <label><input type="checkbox" id="toggleInline" checked> Show inline context</label>
+        </div>
+
+        <div class="drawerRow">
+            <button id="baseColorBtn">Text Color</button>
+            <button id="orpColorBtn">ORP Color</button>
+        </div>
+
+    </div>
+
 </div>
 
 <!-- SINGLE CONTROL BAR -->
@@ -42,38 +73,6 @@
     <button id="backBtn">⟵5</button>
     <button id="forwardBtn">5⟶</button>
     <button id="restartBtn">⟳</button>
-    <button id="settingsBtn">⚙</button>
-</div>
-
-<!-- SETTINGS DRAWER -->
-<div id="settingsDrawer">
-
-    <h2>Settings</h2>
-
-    <div class="drawerRow">
-        <label>WPM</label>
-        <input type="range" id="wpmSlider" min="100" max="1000" value="300">
-        <input type="number" id="wpmInput" value="300">
-    </div>
-
-    <div class="drawerRow">
-        <label>Word Size</label>
-        <input type="range" id="sizeSlider" min="20" max="96" value="48">
-    </div>
-
-    <div class="drawerRow">
-        <label><input type="checkbox" id="toggleBig" checked> Show big centered word</label>
-    </div>
-
-    <div class="drawerRow">
-        <label><input type="checkbox" id="toggleInline" checked> Show inline context</label>
-    </div>
-
-    <div class="drawerRow">
-        <button id="baseColorBtn">Text Color</button>
-        <button id="orpColorBtn">ORP Color</button>
-    </div>
-
 </div>
 
 <script src="script.js"></script>
