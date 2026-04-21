@@ -1,40 +1,27 @@
-/* ============================================================
-   GLOBAL STATE
-============================================================ */
-
+// State
 let words = [];
 let index = 0;
-let running = false;
+let playing = false;
 let timer = null;
-
+let wpm = 300;
+let wordSize = 48;
 let baseColor = "#ffffff";
 let orpColor = "#ff4444";
+let showBig = true;
+let showInline = true;
 
-/* ============================================================
-   ELEMENT REFERENCES
-============================================================ */
-
+// Elements
 const inputText = document.getElementById("inputText");
+const progressBar = document.getElementById("progressBar");
 
 const leftPart = document.getElementById("leftPart");
 const orpPart = document.getElementById("orpPart");
 const rightPart = document.getElementById("rightPart");
 const bigWordInner = document.getElementById("bigWordInner");
 const bigWordContainer = document.getElementById("bigWordContainer");
-
 const inlineContext = document.getElementById("inlineContext");
 
-const wpmSlider = document.getElementById("wpmSlider");
-const wpmInput = document.getElementById("wpmInput");
-const sizeSlider = document.getElementById("sizeSlider");
-const chunkSlider = document.getElementById("chunkSlider");
-
-const toggleBig = document.getElementById("toggleBig");
-const toggleInline = document.getElementById("toggleInline");
-
-const progressBar = document.getElementById("progressBar");
-
-/* MOBILE CONTROLS */
+// Controls
 const mPlay = document.getElementById("mPlay");
 const mPause = document.getElementById("mPause");
 const mBack = document.getElementById("mBack");
@@ -42,380 +29,218 @@ const mForward = document.getElementById("mForward");
 const mRestart = document.getElementById("mRestart");
 const mSettings = document.getElementById("mSettings");
 
-/* SETTINGS DRAWER */
-const drawer = document.getElementById("settingsDrawer");
-
+// Settings drawer
+const settingsDrawer = document.getElementById("settingsDrawer");
 const d_wpmSlider = document.getElementById("d_wpmSlider");
 const d_wpmInput = document.getElementById("d_wpmInput");
 const d_sizeSlider = document.getElementById("d_sizeSlider");
-const d_chunkSlider = document.getElementById("d_chunkSlider");
 const d_toggleBig = document.getElementById("d_toggleBig");
 const d_toggleInline = document.getElementById("d_toggleInline");
 const d_baseColorBtn = document.getElementById("d_baseColorBtn");
 const d_orpColorBtn = document.getElementById("d_orpColorBtn");
 
-/* ============================================================
-   ORP INDEX
-============================================================ */
+// Simple load/save using localStorage
+document.getElementById("loadBtn").addEventListener("click", () => {
+    const saved = localStorage.getItem("rsvp_text") || "";
+    inputText.value = saved;
+    prepareWords();
+});
 
-function orpIndex(word) {
-    return Math.floor((word.length - 1) / 2);
-}
+document.getElementById("saveBtn").addEventListener("click", () => {
+    localStorage.setItem("rsvp_text", inputText.value || "");
+});
 
-/* ============================================================
-   PREPARE WORDS
-============================================================ */
-
+// Prepare words from textarea
 function prepareWords() {
-    const text = inputText.value.trim();
-    if (!text) {
-        words = [];
-        index = 0;
-        updateDisplay();
-        return;
-    }
-    words = text.split(/\s+/);
+    const text = inputText.value || "";
+    words = text
+        .replace(/\s+/g, " ")
+        .trim()
+        .split(" ")
+        .filter(w => w.length > 0);
     index = 0;
     updateDisplay();
+    updateProgress();
 }
 
-/* ============================================================
-   PLAYBACK CONTROLS
-============================================================ */
+// ORP index (rough heuristic)
+function getOrpIndex(word) {
+    if (word.length <= 1) return 0;
+    if (word.length <= 5) return 1;
+    if (word.length <= 9) return 2;
+    return 3;
+}
+
+// Center ORP in container
+function centerORP() {
+    const containerWidth = bigWordContainer.clientWidth;
+    const orpRect = orpPart.getBoundingClientRect();
+    const containerRect = bigWordContainer.getBoundingClientRect();
+
+    const orpCenter = orpRect.left + orpRect.width / 2;
+    const containerCenter = containerRect.left + containerWidth / 2;
+    const delta = containerCenter - orpCenter;
+
+    const currentLeft = parseFloat(getComputedStyle(bigWordInner).left) || 0;
+    bigWordInner.style.left = `${currentLeft + delta}px`;
+}
+
+// Show current word
+function updateDisplay() {
+    if (!words.length || index < 0 || index >= words.length) {
+        leftPart.textContent = "";
+        orpPart.textContent = "";
+        rightPart.textContent = "";
+        inlineContext.textContent = "";
+        return;
+    }
+
+    const word = words[index];
+    const orpIdx = getOrpIndex(word);
+
+    leftPart.textContent = word.slice(0, orpIdx);
+    orpPart.textContent = word.charAt(orpIdx);
+    rightPart.textContent = word.slice(orpIdx + 1);
+
+    bigWordInner.style.fontSize = wordSize + "px";
+    bigWordInner.style.color = baseColor;
+    orpPart.style.color = orpColor;
+
+    document.getElementById("bigWordContainer").style.display = showBig ? "block" : "none";
+
+    if (showInline) {
+        const start = Math.max(0, index - 5);
+        const end = Math.min(words.length, index + 6);
+        inlineContext.textContent = words.slice(start, end).join(" ");
+        inlineContext.style.display = "block";
+    } else {
+        inlineContext.style.display = "none";
+    }
+
+    bigWordInner.style.left = "0px";
+    requestAnimationFrame(centerORP);
+}
+
+// Progress
+function updateProgress() {
+    if (!words.length) {
+        progressBar.style.width = "0%";
+        return;
+    }
+    const pct = (index / words.length) * 100;
+    progressBar.style.width = pct + "%";
+}
+
+// Timing
+function getInterval() {
+    return 60000 / wpm;
+}
+
+function tick() {
+    if (!playing) return;
+    index++;
+    if (index >= words.length) {
+        index = words.length - 1;
+        stop();
+        return;
+    }
+    updateDisplay();
+    updateProgress();
+    timer = setTimeout(tick, getInterval());
+}
 
 function play() {
-    if (words.length === 0) prepareWords();
-    if (words.length === 0) return;
-    if (!running) {
-        running = true;
-        tick();
-    }
+    if (!words.length) prepareWords();
+    if (!words.length) return;
+    if (playing) return;
+    playing = true;
+    updateDisplay();
+    updateProgress();
+    timer = setTimeout(tick, getInterval());
 }
 
-function pause() {
-    running = false;
+function stop() {
+    playing = false;
     if (timer) {
         clearTimeout(timer);
         timer = null;
     }
 }
 
-function restart() {
-    pause();
+// Controls
+mPlay.addEventListener("click", play);
+mPause.addEventListener("click", stop);
+
+mRestart.addEventListener("click", () => {
+    stop();
     index = 0;
     updateDisplay();
-    play();
-}
-
-function skip(seconds) {
-    if (words.length === 0) prepareWords();
-    if (words.length === 0) return;
-
-    const wps = Number(wpmSlider.value) / 60;
-    const delta = Math.round(seconds * wps);
-    index = Math.max(0, Math.min(words.length - 1, index + delta));
-    updateDisplay();
-}
-
-/* ============================================================
-   TICK (WORD ADVANCE)
-============================================================ */
-
-function tick() {
-    if (!running) return;
-    if (index >= words.length) {
-        running = false;
-        return;
-    }
-
-    updateDisplay();
-
-    const chunkSize = Number(chunkSlider.value);
-    index += chunkSize;
-
-    if (index >= words.length) {
-        index = words.length;
-        updateDisplay();
-        running = false;
-        return;
-    }
-
-    let interval = 60000 / Number(wpmSlider.value);
-
-    const prevIndex = index - chunkSize;
-    if (prevIndex >= 0 && prevIndex < words.length) {
-        const word = words[prevIndex];
-        if (/[.!?]$/.test(word)) interval *= 1.8;
-        else if (/[,;:]$/.test(word)) interval *= 1.4;
-    }
-
-    timer = setTimeout(tick, interval);
-}
-
-/* ============================================================
-   MAIN DISPLAY UPDATE
-============================================================ */
-
-function updateDisplay() {
-    if (words.length === 0) {
-        leftPart.textContent = "";
-        orpPart.textContent = "";
-        rightPart.textContent = "";
-        inlineContext.textContent = "";
-        progressBar.style.width = "0%";
-        return;
-    }
-
-    const chunkSize = Number(chunkSlider.value);
-    const idx = Math.max(0, Math.min(index, words.length - 1));
-    const chunk = words.slice(idx, idx + chunkSize);
-    const firstWord = chunk[0] || "";
-
-    const i = orpIndex(firstWord);
-    const left = firstWord.slice(0, i);
-    const pivot = firstWord[i] || "";
-    const right = firstWord.slice(i + 1);
-
-    leftPart.textContent = left;
-    orpPart.textContent = pivot;
-    rightPart.textContent = right;
-
-    /* Colors */
-    leftPart.style.color = baseColor;
-    rightPart.style.color = baseColor;
-    orpPart.style.color = orpColor;
-
-    /* Font size */
-    const size = sizeSlider.value + "px";
-    leftPart.style.fontSize = size;
-    orpPart.style.fontSize = size;
-    rightPart.style.fontSize = size;
-
-    /* Show/hide big word */
-    bigWordContainer.style.display = toggleBig.checked ? "block" : "none";
-
-    /* Pixel-perfect ORP centering */
-    centerORP();
-
-    /* Inline context */
-    if (toggleInline.checked) {
-        const prev = words[idx - 1] || "";
-        const next = words[idx + chunkSize] || "";
-        inlineContext.textContent = `${prev}  [${chunk.join(" ")}]  ${next}`;
-        inlineContext.style.display = "block";
-    } else {
-        inlineContext.style.display = "none";
-    }
-
-    /* Progress */
-    progressBar.style.width = (idx / words.length) * 100 + "%";
-}
-
-/* ============================================================
-   ORP CENTERING ENGINE (DOUBLE RAF)
-============================================================ */
-
-function centerORP() {
-    if (!orpPart.textContent) return;
-
-    requestAnimationFrame(() => {
-        const leftWidth = leftPart.offsetWidth;
-        const pivotWidth = orpPart.offsetWidth;
-        const containerWidth = bigWordContainer.clientWidth;
-
-        const pivotCenter = leftWidth + pivotWidth / 2;
-        const containerCenter = containerWidth / 2;
-
-        const shift = containerCenter - pivotCenter;
-
-        bigWordInner.style.left = shift + "px";
-    });
-}
-
-
-
-
-
-/* ============================================================
-   SYNC DESKTOP + MOBILE CONTROLS
-============================================================ */
-
-function syncToMobile() {
-    d_wpmSlider.value = wpmSlider.value;
-    d_wpmInput.value = wpmInput.value;
-    d_sizeSlider.value = sizeSlider.value;
-    d_chunkSlider.value = chunkSlider.value;
-    d_toggleBig.checked = toggleBig.checked;
-    d_toggleInline.checked = toggleInline.checked;
-}
-
-function syncToDesktop() {
-    wpmSlider.value = d_wpmSlider.value;
-    wpmInput.value = d_wpmInput.value;
-    sizeSlider.value = d_sizeSlider.value;
-    chunkSlider.value = d_chunkSlider.value;
-    toggleBig.checked = d_toggleBig.checked;
-    toggleInline.checked = d_toggleInline.checked;
-    updateDisplay();
-}
-
-/* ============================================================
-   SETTINGS DRAWER
-============================================================ */
-
-mSettings.onclick = () => {
-    syncToMobile();
-    drawer.classList.add("open");
-};
-
-drawer.onclick = (e) => {
-    if (e.target === drawer) drawer.classList.remove("open");
-};
-
-/* Close drawer when tapping outside */
-document.addEventListener("click", (e) => {
-    if (!drawer.contains(e.target) && e.target !== mSettings) {
-        drawer.classList.remove("open");
-    }
+    updateProgress();
 });
 
-/* Drawer controls update desktop controls */
-d_wpmSlider.oninput = () => {
-    d_wpmInput.value = d_wpmSlider.value;
-    syncToDesktop();
-};
-d_wpmInput.onchange = () => {
-    d_wpmSlider.value = d_wpmInput.value;
-    syncToDesktop();
-};
+mBack.addEventListener("click", () => {
+    index = Math.max(0, index - Math.round((wpm / 60) * 5));
+    updateDisplay();
+    updateProgress();
+});
 
-d_sizeSlider.oninput = () => {
-    syncToDesktop();
-};
+mForward.addEventListener("click", () => {
+    index = Math.min(words.length - 1, index + Math.round((wpm / 60) * 5));
+    updateDisplay();
+    updateProgress();
+});
 
-d_chunkSlider.oninput = () => {
-    syncToDesktop();
-};
+// Settings drawer toggle
+mSettings.addEventListener("click", () => {
+    settingsDrawer.classList.toggle("open");
+});
 
-d_toggleBig.onchange = () => {
-    syncToDesktop();
-};
+// WPM sync
+d_wpmSlider.addEventListener("input", () => {
+    wpm = parseInt(d_wpmSlider.value, 10) || 300;
+    d_wpmInput.value = wpm;
+});
 
-d_toggleInline.onchange = () => {
-    syncToDesktop();
-};
+d_wpmInput.addEventListener("input", () => {
+    wpm = parseInt(d_wpmInput.value, 10) || 300;
+    d_wpmSlider.value = wpm;
+});
 
-d_baseColorBtn.onclick = () => {
-    const c = prompt("Enter text color:", baseColor);
+// Size
+d_sizeSlider.addEventListener("input", () => {
+    wordSize = parseInt(d_sizeSlider.value, 10) || 48;
+    updateDisplay();
+});
+
+// Toggles
+d_toggleBig.addEventListener("change", () => {
+    showBig = d_toggleBig.checked;
+    updateDisplay();
+});
+
+d_toggleInline.addEventListener("change", () => {
+    showInline = d_toggleInline.checked;
+    updateDisplay();
+});
+
+// Colors (simple prompt-based for now)
+d_baseColorBtn.addEventListener("click", () => {
+    const c = prompt("Base text color (CSS value):", baseColor);
     if (c) {
         baseColor = c;
         updateDisplay();
     }
-};
+});
 
-d_orpColorBtn.onclick = () => {
-    const c = prompt("Enter ORP color:", orpColor);
+d_orpColorBtn.addEventListener("click", () => {
+    const c = prompt("ORP color (CSS value):", orpColor);
     if (c) {
         orpColor = c;
         updateDisplay();
     }
-};
-
-/* ============================================================
-   DESKTOP CONTROLS
-============================================================ */
-
-wpmSlider.oninput = () => {
-    wpmInput.value = wpmSlider.value;
-    updateDisplay();
-};
-
-wpmInput.onchange = () => {
-    let v = Number(wpmInput.value);
-    if (isNaN(v)) v = 300;
-    v = Math.max(50, Math.min(2000, v));
-    wpmSlider.value = v;
-    wpmInput.value = v;
-    updateDisplay();
-};
-
-sizeSlider.oninput = updateDisplay;
-chunkSlider.oninput = updateDisplay;
-toggleBig.onchange = updateDisplay;
-toggleInline.onchange = updateDisplay;
-
-/* ============================================================
-   BUTTONS
-============================================================ */
-
-document.getElementById("playBtn").onclick = play;
-document.getElementById("pauseBtn").onclick = pause;
-document.getElementById("restartBtn").onclick = restart;
-document.getElementById("backBtn").onclick = () => skip(-5);
-document.getElementById("forwardBtn").onclick = () => skip(5);
-
-/* MOBILE BUTTONS */
-mPlay.onclick = play;
-mPause.onclick = pause;
-mRestart.onclick = restart;
-mBack.onclick = () => skip(-5);
-mForward.onclick = () => skip(5);
-
-/* ============================================================
-   LOAD / SAVE TEXT
-============================================================ */
-
-document.getElementById("loadBtn").onclick = () => {
-    const input = document.createElement("input");
-    input.type = "file";
-    input.accept = ".txt";
-    input.onchange = e => {
-        const file = e.target.files[0];
-        if (!file) return;
-        file.text().then(t => {
-            inputText.value = t;
-            words = [];
-            index = 0;
-            updateDisplay();
-        });
-    };
-    input.click();
-};
-
-document.getElementById("saveBtn").onclick = () => {
-    const blob = new Blob([inputText.value], { type: "text/plain" });
-    const a = document.createElement("a");
-    a.href = URL.createObjectURL(blob);
-    a.download = "text.txt";
-    a.click();
-};
-
-/* ============================================================
-   KEYBOARD SHORTCUTS
-============================================================ */
-
-document.addEventListener("keydown", e => {
-    if (e.code === "Space") {
-        e.preventDefault();
-        running ? pause() : play();
-    } else if (e.code === "ArrowLeft") {
-        skip(-5);
-    } else if (e.code === "ArrowRight") {
-        skip(5);
-    } else if (e.key === "r" || e.key === "R") {
-        restart();
-    }
 });
 
-/* ============================================================
-   RESIZE + ORIENTATION FIXES
-============================================================ */
-
-window.addEventListener("resize", centerORP);
-window.addEventListener("orientationchange", centerORP);
-
-/* ============================================================
-   INITIAL RENDER
-============================================================ */
-
+// Init
+prepareWords();
 updateDisplay();
+updateProgress();
