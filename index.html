@@ -2,141 +2,9 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RSVP Reader</title>
+    <title>RSVP Reader (Clean Build)</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <style>
-        body {
-            margin: 0;
-            padding: 0;
-            background: #1a1a1a;
-            color: #ffffff;
-            font-family: Arial, sans-serif;
-        }
-
-        #app {
-            max-width: 900px;
-            margin: 0 auto;
-            padding: 20px;
-            padding-bottom: 160px;
-        }
-
-        textarea {
-            width: 100%;
-            height: 150px;
-            background: #111;
-            color: #fff;
-            border: 1px solid #444;
-            padding: 10px;
-            resize: vertical;
-        }
-
-        button {
-            background: #333;
-            color: #fff;
-            border: none;
-            padding: 8px 14px;
-            margin: 3px;
-            cursor: pointer;
-            border-radius: 4px;
-        }
-
-        button:hover {
-            background: #444;
-        }
-
-        #progressContainer {
-            width: 100%;
-            height: 8px;
-            background: #333;
-            margin: 15px 0;
-            border-radius: 4px;
-            overflow: hidden;
-        }
-
-        #progressBar {
-            height: 100%;
-            width: 0%;
-            background: #8888ff;
-        }
-
-        #bigWordContainer {
-            position: relative;
-            width: 100%;
-            height: 140px;
-            overflow: hidden;
-        }
-
-        #bigWordInner {
-            position: absolute;
-            top: 50%;
-            left: 0;
-            transform: translate(0, -50%);
-            white-space: nowrap;
-        }
-
-        #leftPart,
-        #orpPart,
-        #rightPart {
-            display: inline-block;
-            white-space: nowrap;
-        }
-
-        #orpPart {
-            color: #ff4444;
-        }
-
-        #inlineContext {
-            text-align: center;
-            font-size: 18px;
-            opacity: 0.85;
-            margin-top: 10px;
-        }
-
-        /* SETTINGS ALWAYS VISIBLE */
-        #settingsPanel {
-            background: #222;
-            border: 1px solid #444;
-            padding: 20px;
-            margin-top: 20px;
-            border-radius: 6px;
-        }
-
-        .drawerRow {
-            margin: 12px 0;
-        }
-
-        .drawerRow label {
-            display: block;
-            margin-bottom: 6px;
-        }
-
-        .drawerRow input[type="range"] {
-            width: 100%;
-        }
-
-        .drawerRow button {
-            width: 48%;
-        }
-
-        /* CONTROL BAR */
-        #controlsBar {
-            position: fixed;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            background: #111;
-            border-top: 1px solid #333;
-            padding: 8px 0;
-            display: flex;
-            justify-content: space-around;
-            z-index: 1000;
-        }
-
-        #controlsBar button {
-            font-size: 20px;
-            padding: 10px 14px;
-        }
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
@@ -150,14 +18,14 @@
         <div id="progressBar"></div>
     </div>
 
+    <!-- BIG WORD DISPLAY -->
     <div id="bigWordContainer">
         <div id="bigWordInner">
-            <span id="leftPart"></span>
-            <span id="orpPart"></span>
-            <span id="rightPart"></span>
+            <span id="bigWord"></span>
         </div>
     </div>
 
+    <!-- INLINE CONTEXT -->
     <div id="inlineContext"></div>
 
     <!-- SETTINGS ALWAYS VISIBLE -->
@@ -165,22 +33,22 @@
 
         <h2>Settings</h2>
 
-        <div class="drawerRow">
+        <div class="settingsRow">
             <label>WPM</label>
             <input type="range" id="wpmSlider" min="100" max="1000" value="300">
             <input type="number" id="wpmInput" value="300">
         </div>
 
-        <div class="drawerRow">
+        <div class="settingsRow">
             <label>Word Size</label>
             <input type="range" id="sizeSlider" min="20" max="96" value="48">
         </div>
 
-        <div class="drawerRow">
-            <label><input type="checkbox" id="toggleBig" checked> Show big centered word</label>
+        <div class="settingsRow">
+            <label><input type="checkbox" id="toggleBig" checked> Show big word</label>
         </div>
 
-        <div class="drawerRow">
+        <div class="settingsRow">
             <label><input type="checkbox" id="toggleInline" checked> Show inline context</label>
         </div>
 
@@ -188,7 +56,7 @@
 
 </div>
 
-<!-- SINGLE CONTROL BAR -->
+<!-- CONTROL BAR -->
 <div id="controlsBar">
     <button id="playBtn">▶</button>
     <button id="pauseBtn">⏸</button>
@@ -197,221 +65,6 @@
     <button id="restartBtn">⟳</button>
 </div>
 
-<script>
-    // STATE
-    let words = [];
-    let index = 0;
-    let playing = false;
-    let timer = null;
-
-    let wpm = 300;
-    let wordSize = 48;
-
-    let showBig = true;
-    let showInline = true;
-
-    // ELEMENTS
-    const inputText = document.getElementById("inputText");
-
-    const leftPart = document.getElementById("leftPart");
-    const orpPart = document.getElementById("orpPart");
-    const rightPart = document.getElementById("rightPart");
-
-    const bigWordInner = document.getElementById("bigWordInner");
-    const bigWordContainer = document.getElementById("bigWordContainer");
-    const inlineContext = document.getElementById("inlineContext");
-
-    const progressBar = document.getElementById("progressBar");
-
-    const playBtn = document.getElementById("playBtn");
-    const pauseBtn = document.getElementById("pauseBtn");
-    const backBtn = document.getElementById("backBtn");
-    const forwardBtn = document.getElementById("forwardBtn");
-    const restartBtn = document.getElementById("restartBtn");
-
-    const wpmSlider = document.getElementById("wpmSlider");
-    const wpmInput = document.getElementById("wpmInput");
-    const sizeSlider = document.getElementById("sizeSlider");
-
-    const toggleBig = document.getElementById("toggleBig");
-    const toggleInline = document.getElementById("toggleInline");
-
-    // WORD PREP
-    function prepareWords() {
-        const text = inputText.value.trim();
-        if (!text) {
-            words = [];
-            index = 0;
-            updateDisplay();
-            updateProgress();
-            return;
-        }
-        words = text.replace(/\s+/g, " ").split(" ");
-        index = 0;
-        updateDisplay();
-        updateProgress();
-    }
-
-    // ORP
-    function getOrpIndex(word) {
-        if (word.length <= 1) return 0;
-        if (word.length <= 5) return 1;
-        if (word.length <= 9) return 2;
-        return 3;
-    }
-
-    function centerORP() {
-        const containerRect = bigWordContainer.getBoundingClientRect();
-        const orpRect = orpPart.getBoundingClientRect();
-
-        const containerCenter = containerRect.left + containerRect.width / 2;
-        const orpCenter = orpRect.left + orpRect.width / 2;
-
-        const delta = containerCenter - orpCenter;
-
-        const currentLeft = parseFloat(getComputedStyle(bigWordInner).left) || 0;
-        bigWordInner.style.left = `${currentLeft + delta}px`;
-    }
-
-    // DISPLAY
-    function updateDisplay() {
-        if (!words.length) {
-            leftPart.textContent = "";
-            orpPart.textContent = "";
-            rightPart.textContent = "";
-            inlineContext.textContent = "";
-            return;
-        }
-
-        const word = words[index];
-        const orpIdx = getOrpIndex(word);
-
-        leftPart.textContent = word.slice(0, orpIdx);
-        orpPart.textContent = word.charAt(orpIdx);
-        rightPart.textContent = word.slice(orpIdx + 1);
-
-        bigWordInner.style.fontSize = wordSize + "px";
-
-        bigWordContainer.style.display = showBig ? "block" : "none";
-
-        if (showInline) {
-            const start = Math.max(0, index - 5);
-            const end = Math.min(words.length, index + 6);
-            inlineContext.textContent = words.slice(start, end).join(" ");
-            inlineContext.style.display = "block";
-        } else {
-            inlineContext.style.display = "none";
-        }
-
-        bigWordInner.style.left = "0px";
-        requestAnimationFrame(centerORP);
-    }
-
-    // PROGRESS
-    function updateProgress() {
-        if (!words.length) {
-            progressBar.style.width = "0%";
-            return;
-        }
-        progressBar.style.width = (index / words.length) * 100 + "%";
-    }
-
-    // PLAYBACK
-    function getInterval() {
-        return 60000 / wpm;
-    }
-
-    function tick() {
-        if (!playing) return;
-
-        index++;
-        if (index >= words.length) {
-            index = words.length - 1;
-            stop();
-            return;
-        }
-
-        updateDisplay();
-        updateProgress();
-
-        timer = setTimeout(tick, getInterval());
-    }
-
-    function play() {
-        if (!words.length) prepareWords();
-        if (!words.length) return;
-
-        if (playing) return;
-        playing = true;
-
-        updateDisplay();
-        updateProgress();
-
-        timer = setTimeout(tick, getInterval());
-    }
-
-    function stop() {
-        playing = false;
-        if (timer) {
-            clearTimeout(timer);
-            timer = null;
-        }
-    }
-
-    // CONTROLS
-    playBtn.addEventListener("click", play);
-    pauseBtn.addEventListener("click", stop);
-
-    restartBtn.addEventListener("click", () => {
-        stop();
-        index = 0;
-        updateDisplay();
-        updateProgress();
-    });
-
-    backBtn.addEventListener("click", () => {
-        const jump = Math.round((wpm / 60) * 5);
-        index = Math.max(0, index - jump);
-        updateDisplay();
-        updateProgress();
-    });
-
-    forwardBtn.addEventListener("click", () => {
-        const jump = Math.round((wpm / 60) * 5);
-        index = Math.min(words.length - 1, index + jump);
-        updateDisplay();
-        updateProgress();
-    });
-
-    // SETTINGS
-    wpmSlider.addEventListener("input", () => {
-        wpm = parseInt(wpmSlider.value, 10) || 300;
-        wpmInput.value = wpm;
-    });
-
-    wpmInput.addEventListener("input", () => {
-        wpm = parseInt(wpmInput.value, 10) || 300;
-        wpmSlider.value = wpm;
-    });
-
-    sizeSlider.addEventListener("input", () => {
-        wordSize = parseInt(sizeSlider.value, 10) || 48;
-        updateDisplay();
-    });
-
-    toggleBig.addEventListener("change", () => {
-        showBig = toggleBig.checked;
-        updateDisplay();
-    });
-
-    toggleInline.addEventListener("change", () => {
-        showInline = toggleInline.checked;
-        updateDisplay();
-    });
-
-    // INIT
-    updateDisplay();
-    updateProgress();
-</script>
+<script src="script.js"></script>
 </body>
 </html>
