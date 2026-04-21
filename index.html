@@ -1,10 +1,137 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <title>RSVP Reader</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="stylesheet" href="style.css">
+<meta charset="UTF-8">
+<title>RSVP Reader</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+    body {
+        margin: 0;
+        padding: 0;
+        background: #121212;
+        color: #ffffff;
+        font-family: Arial, sans-serif;
+    }
+
+    #app {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+        padding-bottom: 160px;
+    }
+
+    textarea {
+        width: 100%;
+        height: 150px;
+        background: #1e1e1e;
+        color: #fff;
+        border: 1px solid #444;
+        padding: 10px;
+        resize: vertical;
+    }
+
+    #progressContainer {
+        width: 100%;
+        height: 8px;
+        background: #333;
+        margin: 15px 0;
+        border-radius: 4px;
+        overflow: hidden;
+    }
+
+    #progressBar {
+        height: 100%;
+        width: 0%;
+        background: #8888ff;
+    }
+
+    /* BIG WORD DISPLAY */
+    #bigWordContainer {
+        position: relative;
+        width: 100%;
+        height: 140px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #bigWordInner {
+        white-space: nowrap;
+        font-weight: bold;
+        position: relative;
+        left: 0;
+    }
+
+    #leftPart, #orpPart, #rightPart {
+        display: inline-block;
+        white-space: nowrap;
+    }
+
+    #orpPart {
+        color: #ff4444;
+    }
+
+    /* INLINE CONTEXT */
+    #inlineContext {
+        text-align: center;
+        font-size: 20px;
+        margin-top: 10px;
+        opacity: 0.9;
+    }
+
+    /* SETTINGS PANEL */
+    #settingsPanel {
+        background: #1e1e1e;
+        border: 1px solid #444;
+        padding: 20px;
+        margin-top: 20px;
+        border-radius: 6px;
+    }
+
+    .settingsRow {
+        margin: 12px 0;
+    }
+
+    .settingsRow label {
+        display: block;
+        margin-bottom: 6px;
+    }
+
+    .settingsRow input[type="range"],
+    .settingsRow input[type="color"] {
+        width: 100%;
+    }
+
+    /* CONTROL BAR */
+    #controlsBar {
+        position: fixed;
+        bottom: 0;
+        left: 0;
+        width: 100%;
+        background: #111;
+        border-top: 1px solid #333;
+        padding: 10px 0;
+        display: flex;
+        justify-content: space-around;
+        z-index: 1000;
+    }
+
+    #controlsBar button {
+        background: #333;
+        color: #fff;
+        border: none;
+        padding: 10px 16px;
+        margin: 3px;
+        cursor: pointer;
+        border-radius: 4px;
+        font-size: 18px;
+    }
+
+    #controlsBar button:hover {
+        background: #444;
+    }
+</style>
 </head>
 <body>
 
@@ -18,7 +145,7 @@
         <div id="progressBar"></div>
     </div>
 
-    <!-- BIG WORD DISPLAY WITH ORP COLUMNS -->
+    <!-- BIG WORD DISPLAY WITH ORP -->
     <div id="bigWordContainer">
         <div id="bigWordInner">
             <span id="leftPart"></span>
@@ -27,10 +154,8 @@
         </div>
     </div>
 
-    <!-- INLINE CONTEXT -->
     <div id="inlineContext"></div>
 
-    <!-- SETTINGS ALWAYS VISIBLE -->
     <div id="settingsPanel">
 
         <h2>Settings</h2>
@@ -60,7 +185,6 @@
 
 </div>
 
-<!-- CONTROL BAR -->
 <div id="controlsBar">
     <button id="playBtn">▶</button>
     <button id="pauseBtn">⏸</button>
@@ -69,6 +193,228 @@
     <button id="restartBtn">⟳</button>
 </div>
 
-<script src="script.js"></script>
+<script>
+/* ---------------- STATE ---------------- */
+let words = [];
+let index = 0;
+let playing = false;
+let timer = null;
+
+let wpm = 300;
+let wordSize = 48;
+
+let baseColor = "#ffffff";
+let orpColor = "#ff4444";
+
+/* ---------------- ELEMENTS ---------------- */
+const inputText = document.getElementById("inputText");
+
+const leftPart = document.getElementById("leftPart");
+const orpPart = document.getElementById("orpPart");
+const rightPart = document.getElementById("rightPart");
+
+const bigWordInner = document.getElementById("bigWordInner");
+const bigWordContainer = document.getElementById("bigWordContainer");
+
+const inlineContext = document.getElementById("inlineContext");
+const progressBar = document.getElementById("progressBar");
+
+const playBtn = document.getElementById("playBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const backBtn = document.getElementById("backBtn");
+const forwardBtn = document.getElementById("forwardBtn");
+const restartBtn = document.getElementById("restartBtn");
+
+const wpmSlider = document.getElementById("wpmSlider");
+const wpmInput = document.getElementById("wpmInput");
+const sizeSlider = document.getElementById("sizeSlider");
+
+const baseColorPicker = document.getElementById("baseColorPicker");
+const orpColorPicker = document.getElementById("orpColorPicker");
+
+/* ---------------- ORP LOGIC ---------------- */
+function getOrpIndex(word) {
+    if (word.length <= 1) return 0;
+    if (word.length <= 5) return 1;
+    if (word.length <= 9) return 2;
+    return 3;
+}
+
+/* ---------------- WORD PREP ---------------- */
+function prepareWords() {
+    const text = inputText.value.trim();
+    if (!text) {
+        words = [];
+        index = 0;
+        updateDisplay();
+        updateProgress();
+        return;
+    }
+    words = text.replace(/\s+/g, " ").split(" ");
+    index = 0;
+}
+
+/* ---------------- DISPLAY ---------------- */
+function updateDisplay() {
+    if (!words.length) {
+        leftPart.textContent = "";
+        orpPart.textContent = "";
+        rightPart.textContent = "";
+        inlineContext.textContent = "";
+        return;
+    }
+
+    const word = words[index];
+    const orpIdx = getOrpIndex(word);
+
+    leftPart.textContent = word.slice(0, orpIdx);
+    orpPart.textContent = word.charAt(orpIdx);
+    rightPart.textContent = word.slice(orpIdx + 1);
+
+    leftPart.style.fontSize = wordSize + "px";
+    orpPart.style.fontSize = wordSize + "px";
+    rightPart.style.fontSize = wordSize + "px";
+
+    leftPart.style.color = baseColor;
+    rightPart.style.color = baseColor;
+    orpPart.style.color = orpColor;
+
+    /* Inline context highlight */
+    const start = Math.max(0, index - 5);
+    const end = Math.min(words.length, index + 6);
+
+    inlineContext.innerHTML = words
+        .slice(start, end)
+        .map((w, i) => {
+            const globalIndex = start + i;
+            if (globalIndex === index) {
+                return `<span style="color:${orpColor}; font-weight:bold;">${w}</span>`;
+            }
+            return w;
+        })
+        .join(" ");
+
+    /* Column lock: center ORP letter */
+    bigWordInner.style.left = "0px";
+    requestAnimationFrame(() => {
+        const container = bigWordContainer.getBoundingClientRect();
+        const orpRect = orpPart.getBoundingClientRect();
+
+        const containerCenter = container.left + container.width / 2;
+        const orpCenter = orpRect.left + orpRect.width / 2;
+
+        const delta = containerCenter - orpCenter;
+        bigWordInner.style.left = `${delta}px`;
+    });
+}
+
+/* ---------------- PROGRESS ---------------- */
+function updateProgress() {
+    if (!words.length) {
+        progressBar.style.width = "0%";
+        return;
+    }
+    progressBar.style.width = (index / words.length) * 100 + "%";
+}
+
+/* ---------------- PLAYBACK ---------------- */
+function getInterval() {
+    return 60000 / wpm;
+}
+
+function tick() {
+    if (!playing) return;
+
+    index++;
+    if (index >= words.length) {
+        index = words.length - 1;
+        stop();
+        return;
+    }
+
+    updateDisplay();
+    updateProgress();
+
+    timer = setTimeout(tick, getInterval());
+}
+
+function play() {
+    prepareWords(); // ALWAYS reload text
+
+    if (!words.length) return;
+
+    if (playing) return;
+    playing = true;
+
+    updateDisplay();
+    updateProgress();
+
+    timer = setTimeout(tick, getInterval());
+}
+
+function stop() {
+    playing = false;
+    if (timer) {
+        clearTimeout(timer);
+        timer = null;
+    }
+}
+
+/* ---------------- CONTROL EVENTS ---------------- */
+playBtn.addEventListener("click", play);
+pauseBtn.addEventListener("click", stop);
+
+restartBtn.addEventListener("click", () => {
+    stop();
+    index = 0;
+    updateDisplay();
+    updateProgress();
+});
+
+backBtn.addEventListener("click", () => {
+    const jump = Math.round((wpm / 60) * 5);
+    index = Math.max(0, index - jump);
+    updateDisplay();
+    updateProgress();
+});
+
+forwardBtn.addEventListener("click", () => {
+    const jump = Math.round((wpm / 60) * 5);
+    index = Math.min(words.length - 1, index + jump);
+    updateDisplay();
+    updateProgress();
+});
+
+/* ---------------- SETTINGS ---------------- */
+wpmSlider.addEventListener("input", () => {
+    wpm = parseInt(wpmSlider.value, 10);
+    wpmInput.value = wpm;
+});
+
+wpmInput.addEventListener("input", () => {
+    wpm = parseInt(wpmInput.value, 10);
+    wpmSlider.value = wpm;
+});
+
+sizeSlider.addEventListener("input", () => {
+    wordSize = parseInt(sizeSlider.value, 10);
+    updateDisplay();
+});
+
+baseColorPicker.addEventListener("input", () => {
+    baseColor = baseColorPicker.value;
+    updateDisplay();
+});
+
+orpColorPicker.addEventListener("input", () => {
+    orpColor = orpColorPicker.value;
+    updateDisplay();
+});
+
+/* ---------------- INIT ---------------- */
+updateDisplay();
+updateProgress();
+</script>
+
 </body>
 </html>
