@@ -32,25 +32,25 @@ const inlineContext = document.getElementById("inlineContext");
 const progressBar = document.getElementById("progressBar");
 
 // Controls
-const mPlay = document.getElementById("mPlay");
-const mPause = document.getElementById("mPause");
-const mBack = document.getElementById("mBack");
-const mForward = document.getElementById("mForward");
-const mRestart = document.getElementById("mRestart");
-const mSettings = document.getElementById("mSettings");
+const playBtn = document.getElementById("playBtn");
+const pauseBtn = document.getElementById("pauseBtn");
+const backBtn = document.getElementById("backBtn");
+const forwardBtn = document.getElementById("forwardBtn");
+const restartBtn = document.getElementById("restartBtn");
+const settingsBtn = document.getElementById("settingsBtn");
 
 // Drawer
 const settingsDrawer = document.getElementById("settingsDrawer");
 
-const d_wpmSlider = document.getElementById("d_wpmSlider");
-const d_wpmInput = document.getElementById("d_wpmInput");
-const d_sizeSlider = document.getElementById("d_sizeSlider");
+const wpmSlider = document.getElementById("wpmSlider");
+const wpmInput = document.getElementById("wpmInput");
+const sizeSlider = document.getElementById("sizeSlider");
 
-const d_toggleBig = document.getElementById("d_toggleBig");
-const d_toggleInline = document.getElementById("d_toggleInline");
+const toggleBig = document.getElementById("toggleBig");
+const toggleInline = document.getElementById("toggleInline");
 
-const d_baseColorBtn = document.getElementById("d_baseColorBtn");
-const d_orpColorBtn = document.getElementById("d_orpColorBtn");
+const baseColorBtn = document.getElementById("baseColorBtn");
+const orpColorBtn = document.getElementById("orpColorBtn");
 
 
 //------------------------------------------------------------
@@ -210,31 +210,31 @@ function stop() {
 //------------------------------------------------------------
 // CONTROL BAR EVENTS
 //------------------------------------------------------------
-mPlay.addEventListener("click", play);
-mPause.addEventListener("click", stop);
+playBtn.addEventListener("click", play);
+pauseBtn.addEventListener("click", stop);
 
-mRestart.addEventListener("click", () => {
+restartBtn.addEventListener("click", () => {
     stop();
     index = 0;
     updateDisplay();
     updateProgress();
 });
 
-mBack.addEventListener("click", () => {
+backBtn.addEventListener("click", () => {
     const jump = Math.round((wpm / 60) * 5);
     index = Math.max(0, index - jump);
     updateDisplay();
     updateProgress();
 });
 
-mForward.addEventListener("click", () => {
+forwardBtn.addEventListener("click", () => {
     const jump = Math.round((wpm / 60) * 5);
     index = Math.min(words.length - 1, index + jump);
     updateDisplay();
     updateProgress();
 });
 
-mSettings.addEventListener("click", () => {
+settingsBtn.addEventListener("click", () => {
     settingsDrawer.classList.toggle("open");
 });
 
@@ -242,32 +242,32 @@ mSettings.addEventListener("click", () => {
 //------------------------------------------------------------
 // SETTINGS EVENTS
 //------------------------------------------------------------
-d_wpmSlider.addEventListener("input", () => {
-    wpm = parseInt(d_wpmSlider.value, 10);
-    d_wpmInput.value = wpm;
+wpmSlider.addEventListener("input", () => {
+    wpm = parseInt(wpmSlider.value, 10);
+    wpmInput.value = wpm;
 });
 
-d_wpmInput.addEventListener("input", () => {
-    wpm = parseInt(d_wpmInput.value, 10);
-    d_wpmSlider.value = wpm;
+wpmInput.addEventListener("input", () => {
+    wpm = parseInt(wpmInput.value, 10);
+    wpmSlider.value = wpm;
 });
 
-d_sizeSlider.addEventListener("input", () => {
-    wordSize = parseInt(d_sizeSlider.value, 10);
+sizeSlider.addEventListener("input", () => {
+    wordSize = parseInt(sizeSlider.value, 10);
     updateDisplay();
 });
 
-d_toggleBig.addEventListener("change", () => {
-    showBig = d_toggleBig.checked;
+toggleBig.addEventListener("change", () => {
+    showBig = toggleBig.checked;
     updateDisplay();
 });
 
-d_toggleInline.addEventListener("change", () => {
-    showInline = d_toggleInline.checked;
+toggleInline.addEventListener("change", () => {
+    showInline = toggleInline.checked;
     updateDisplay();
 });
 
-d_baseColorBtn.addEventListener("click", () => {
+baseColorBtn.addEventListener("click", () => {
     const c = prompt("Base text color:", baseColor);
     if (c) {
         baseColor = c;
@@ -275,7 +275,7 @@ d_baseColorBtn.addEventListener("click", () => {
     }
 });
 
-d_orpColorBtn.addEventListener("click", () => {
+orpColorBtn.addEventListener("click", () => {
     const c = prompt("ORP color:", orpColor);
     if (c) {
         orpColor = c;
