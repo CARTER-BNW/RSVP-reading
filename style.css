@@ -1,4 +1,6 @@
-/* GLOBAL -------------------------------------------------- */
+/* ---------------------------------------------------------
+   GLOBAL
+--------------------------------------------------------- */
 
 body {
     margin: 0;
@@ -14,7 +16,9 @@ body {
     padding: 20px;
 }
 
-/* TEXT INPUT ---------------------------------------------- */
+/* ---------------------------------------------------------
+   TEXT INPUT
+--------------------------------------------------------- */
 
 textarea {
     width: 100%;
@@ -23,9 +27,12 @@ textarea {
     color: #fff;
     border: 1px solid #444;
     padding: 10px;
+    resize: vertical;
 }
 
-/* BUTTONS -------------------------------------------------- */
+/* ---------------------------------------------------------
+   BUTTONS
+--------------------------------------------------------- */
 
 button {
     background: #333;
@@ -37,13 +44,21 @@ button {
     border-radius: 4px;
 }
 
-/* SLIDERS -------------------------------------------------- */
+button:hover {
+    background: #444;
+}
+
+/* ---------------------------------------------------------
+   SLIDERS
+--------------------------------------------------------- */
 
 input[type="range"] {
     width: 200px;
 }
 
-/* PROGRESS BAR -------------------------------------------- */
+/* ---------------------------------------------------------
+   PROGRESS BAR
+--------------------------------------------------------- */
 
 #progressContainer {
     width: 100%;
@@ -51,6 +66,7 @@ input[type="range"] {
     background: #333;
     margin: 15px 0;
     border-radius: 4px;
+    overflow: hidden;
 }
 
 #progressBar {
@@ -59,7 +75,9 @@ input[type="range"] {
     background: #8888ff;
 }
 
-/* BIG WORD ------------------------------------------------- */
+/* ---------------------------------------------------------
+   BIG WORD DISPLAY
+--------------------------------------------------------- */
 
 #bigWordContainer {
     position: relative;
@@ -68,7 +86,7 @@ input[type="range"] {
     overflow: hidden;
 }
 
-/* The entire word is ONE unbreakable line */
+/* Entire word is one unbreakable line */
 #bigWordInner {
     position: absolute;
     top: 50%;
@@ -89,15 +107,90 @@ input[type="range"] {
 #orpPart {
     color: #ff4444;
 }
-#mobileControls {
-    display: none !important;
-}
 
-/* INLINE CONTEXT ------------------------------------------ */
+/* ---------------------------------------------------------
+   INLINE CONTEXT
+--------------------------------------------------------- */
 
 #inlineContext {
     text-align: center;
     font-size: 18px;
     opacity: 0.85;
     margin-top: 10px;
+}
+
+/* ---------------------------------------------------------
+   MOBILE BOTTOM BAR (PRIMARY CONTROLS)
+--------------------------------------------------------- */
+
+#mobileControls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #111;
+    border-top: 1px solid #333;
+    padding: 8px 0;
+    z-index: 1000;
+    display: flex;
+    justify-content: space-around;
+}
+
+#mobileControls button {
+    font-size: 20px;
+    padding: 10px 14px;
+}
+
+/* ---------------------------------------------------------
+   SETTINGS DRAWER
+--------------------------------------------------------- */
+
+#settingsDrawer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: #222;
+    border-top: 2px solid #444;
+    padding: 20px;
+    z-index: 2000;
+    transform: translateY(100%);
+    transition: transform 0.35s ease;
+}
+
+#settingsDrawer.open {
+    transform: translateY(0%);
+}
+
+.drawerRow {
+    margin: 12px 0;
+}
+
+.drawerRow label {
+    display: block;
+    margin-bottom: 6px;
+}
+
+.drawerRow input[type="range"] {
+    width: 100%;
+}
+
+.drawerRow button {
+    width: 48%;
+}
+
+/* ---------------------------------------------------------
+   SPACING FOR BOTTOM BAR
+--------------------------------------------------------- */
+
+#app {
+    padding-bottom: 120px;
+}
+
+/* ---------------------------------------------------------
+   HIDE DESKTOP CONTROLS
+--------------------------------------------------------- */
+
+#desktopControls {
+    display: none !important;
 }
