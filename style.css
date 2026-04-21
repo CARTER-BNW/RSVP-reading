@@ -1,7 +1,3 @@
-/* ---------------------------------------------------------
-   GLOBAL
---------------------------------------------------------- */
-
 body {
     margin: 0;
     padding: 0;
@@ -14,11 +10,8 @@ body {
     max-width: 900px;
     margin: 0 auto;
     padding: 20px;
+    padding-bottom: 120px;
 }
-
-/* ---------------------------------------------------------
-   TEXT INPUT
---------------------------------------------------------- */
 
 textarea {
     width: 100%;
@@ -29,10 +22,6 @@ textarea {
     padding: 10px;
     resize: vertical;
 }
-
-/* ---------------------------------------------------------
-   BUTTONS
---------------------------------------------------------- */
 
 button {
     background: #333;
@@ -48,17 +37,9 @@ button:hover {
     background: #444;
 }
 
-/* ---------------------------------------------------------
-   SLIDERS
---------------------------------------------------------- */
-
 input[type="range"] {
     width: 200px;
 }
-
-/* ---------------------------------------------------------
-   PROGRESS BAR
---------------------------------------------------------- */
 
 #progressContainer {
     width: 100%;
@@ -75,10 +56,6 @@ input[type="range"] {
     background: #8888ff;
 }
 
-/* ---------------------------------------------------------
-   BIG WORD DISPLAY
---------------------------------------------------------- */
-
 #bigWordContainer {
     position: relative;
     width: 100%;
@@ -86,7 +63,6 @@ input[type="range"] {
     overflow: hidden;
 }
 
-/* Entire word is one unbreakable line */
 #bigWordInner {
     position: absolute;
     top: 50%;
@@ -96,7 +72,6 @@ input[type="range"] {
     display: inline-block;
 }
 
-/* Each part stays inline-block so nothing wraps */
 #leftPart,
 #orpPart,
 #rightPart {
@@ -108,20 +83,12 @@ input[type="range"] {
     color: #ff4444;
 }
 
-/* ---------------------------------------------------------
-   INLINE CONTEXT
---------------------------------------------------------- */
-
 #inlineContext {
     text-align: center;
     font-size: 18px;
     opacity: 0.85;
     margin-top: 10px;
 }
-
-/* ---------------------------------------------------------
-   MOBILE BOTTOM BAR (PRIMARY CONTROLS)
---------------------------------------------------------- */
 
 #mobileControls {
     position: fixed;
@@ -140,10 +107,6 @@ input[type="range"] {
     font-size: 20px;
     padding: 10px 14px;
 }
-
-/* ---------------------------------------------------------
-   SETTINGS DRAWER
---------------------------------------------------------- */
 
 #settingsDrawer {
     position: fixed;
@@ -178,20 +141,3 @@ input[type="range"] {
 .drawerRow button {
     width: 48%;
 }
-
-/* ---------------------------------------------------------
-   SPACING FOR BOTTOM BAR
---------------------------------------------------------- */
-
-#app {
-    padding-bottom: 120px;
-}
-
-/* ---------------------------------------------------------
-   HIDE DESKTOP CONTROLS
---------------------------------------------------------- 
-
-#desktopControls {
-    display: none !important;
-}
-*/
