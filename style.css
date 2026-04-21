@@ -89,6 +89,9 @@ input[type="range"] {
 #orpPart {
     color: #ff4444;
 }
+#mobileControls {
+    display: none !important;
+}
 
 /* INLINE CONTEXT ------------------------------------------ */
 
