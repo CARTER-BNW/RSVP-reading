@@ -10,7 +10,7 @@
 
 <div id="app">
 
-    <!-- DESKTOP HEADER -->
+    <!-- HEADER -->
     <h1 id="desktopTitle">RSVP Speed Reader</h1>
 
     <!-- TEXT INPUT AREA -->
@@ -23,45 +23,6 @@
         </div>
     </div>
 
-    <!-- DESKTOP CONTROLS -->
-    <div id="desktopControls">
-
-        <div class="row">
-            <button id="playBtn">Play</button>
-            <button id="pauseBtn">Pause</button>
-            <button id="restartBtn">Restart</button>
-            <button id="backBtn">⟵ 5s</button>
-            <button id="forwardBtn">5s ⟶</button>
-        </div>
-
-        <div class="row">
-            <label>WPM</label>
-            <input type="range" id="wpmSlider" min="100" max="1000" value="300">
-            <input type="number" id="wpmInput" value="300">
-        </div>
-
-        <div class="row">
-            <label>Word Size</label>
-            <input type="range" id="sizeSlider" min="20" max="96" value="48">
-        </div>
-
-        <!-- CHUNK SIZE REMOVED -->
-
-        <div class="row">
-            <label><input type="checkbox" id="toggleBig" checked> Show big centered word</label>
-        </div>
-
-        <div class="row">
-            <label><input type="checkbox" id="toggleInline" checked> Show inline context</label>
-        </div>
-
-        <div class="row">
-            <button id="baseColorBtn">Text Color</button>
-            <button id="orpColorBtn">ORP Color</button>
-        </div>
-
-    </div>
-
     <!-- PROGRESS BAR -->
     <div id="progressContainer">
         <div id="progressBar"></div>
@@ -71,11 +32,11 @@
     <div id="displayArea">
 
         <div id="bigWordContainer">
-            <span id="bigWordInner">
+            <div id="bigWordInner">
                 <span id="leftPart"></span>
                 <span id="orpPart"></span>
                 <span id="rightPart"></span>
-            </span>
+            </div>
         </div>
 
         <div id="inlineContext"></div>
@@ -84,7 +45,7 @@
 
 </div>
 
-<!-- MOBILE BOTTOM BAR -->
+<!-- MOBILE BOTTOM BAR (PRIMARY CONTROLS) -->
 <div id="mobileControls">
     <button id="mPlay">▶</button>
     <button id="mPause">⏸</button>
@@ -94,10 +55,8 @@
     <button id="mSettings">⚙</button>
 </div>
 
-<!-- MOBILE SETTINGS DRAWER -->
+<!-- SETTINGS DRAWER -->
 <div id="settingsDrawer">
-
-    <div id="drawerHandle"></div>
 
     <h2>Settings</h2>
 
@@ -111,8 +70,6 @@
         <label>Word Size</label>
         <input type="range" id="d_sizeSlider" min="20" max="96" value="48">
     </div>
-
-    <!-- CHUNK SIZE REMOVED -->
 
     <div class="drawerRow">
         <label><input type="checkbox" id="d_toggleBig" checked> Show big centered word</label>
