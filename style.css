@@ -13,6 +13,10 @@ body {
     padding-bottom: 160px;
 }
 
+h1 {
+    margin-top: 0;
+}
+
 textarea {
     width: 100%;
     height: 150px;
@@ -52,32 +56,25 @@ button:hover {
     background: #8888ff;
 }
 
+/* BIG WORD DISPLAY */
 #bigWordContainer {
     position: relative;
     width: 100%;
     height: 140px;
-    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 #bigWordInner {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    transform: translate(0, -50%);
-    white-space: nowrap;
+    text-align: center;
 }
 
-#leftPart,
-#orpPart,
-#rightPart {
+#bigWord {
     display: inline-block;
-    white-space: nowrap;
 }
 
-#orpPart {
-    color: #ff4444;
-}
-
+/* INLINE CONTEXT */
 #inlineContext {
     text-align: center;
     font-size: 18px;
@@ -85,7 +82,7 @@ button:hover {
     margin-top: 10px;
 }
 
-/* ALWAYS VISIBLE SETTINGS PANEL */
+/* SETTINGS PANEL */
 #settingsPanel {
     background: #222;
     border: 1px solid #444;
@@ -94,21 +91,17 @@ button:hover {
     border-radius: 6px;
 }
 
-.drawerRow {
+.settingsRow {
     margin: 12px 0;
 }
 
-.drawerRow label {
+.settingsRow label {
     display: block;
     margin-bottom: 6px;
 }
 
-.drawerRow input[type="range"] {
+.settingsRow input[type="range"] {
     width: 100%;
-}
-
-.drawerRow button {
-    width: 48%;
 }
 
 /* CONTROL BAR */
