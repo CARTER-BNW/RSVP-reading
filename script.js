@@ -18,9 +18,12 @@ let showInline = true;
 //------------------------------------------------------------
 const inputText = document.getElementById("inputText");
 
-const bigWordSpan = document.getElementById("bigWord");
 const bigWordContainer = document.getElementById("bigWordContainer");
 const inlineContext = document.getElementById("inlineContext");
+
+const leftPart = document.getElementById("leftPart");
+const orpPart = document.getElementById("orpPart");
+const rightPart = document.getElementById("rightPart");
 
 const progressBar = document.getElementById("progressBar");
 
@@ -41,10 +44,22 @@ const toggleInline = document.getElementById("toggleInline");
 
 
 //------------------------------------------------------------
+// ORP LOGIC
+//------------------------------------------------------------
+function getOrpIndex(word) {
+    if (word.length <= 1) return 0;
+    if (word.length <= 5) return 1;
+    if (word.length <= 9) return 2;
+    return 3;
+}
+
+
+//------------------------------------------------------------
 // WORD PREP
 //------------------------------------------------------------
 function prepareWords() {
     const text = inputText.value.trim();
+
     if (!text) {
         words = [];
         index = 0;
@@ -55,9 +70,6 @@ function prepareWords() {
 
     words = text.replace(/\s+/g, " ").split(" ");
     index = 0;
-
-    updateDisplay();
-    updateProgress();
 }
 
 
@@ -66,16 +78,26 @@ function prepareWords() {
 //------------------------------------------------------------
 function updateDisplay() {
     if (!words.length) {
-        bigWordSpan.textContent = "";
+        leftPart.textContent = "";
+        orpPart.textContent = "";
+        rightPart.textContent = "";
         inlineContext.textContent = "";
         return;
     }
 
     const word = words[index];
+    const orpIdx = getOrpIndex(word);
 
-    // Big word
-    bigWordSpan.textContent = word;
-    bigWordSpan.style.fontSize = wordSize + "px";
+    leftPart.textContent = word.slice(0, orpIdx);
+    orpPart.textContent = word.charAt(orpIdx);
+    rightPart.textContent = word.slice(orpIdx + 1);
+
+    // Apply size
+    leftPart.style.fontSize = wordSize + "px";
+    orpPart.style.fontSize = wordSize + "px";
+    rightPart.style.fontSize = wordSize + "px";
+
+    // Big word toggle
     bigWordContainer.style.display = showBig ? "flex" : "none";
 
     // Inline context
@@ -126,7 +148,9 @@ function tick() {
 }
 
 function play() {
-    if (!words.length) prepareWords();
+    // ⭐ ALWAYS reload text when Play is pressed
+    prepareWords();
+
     if (!words.length) return;
 
     if (playing) return;
@@ -179,17 +203,17 @@ forwardBtn.addEventListener("click", () => {
 // SETTINGS EVENTS
 //------------------------------------------------------------
 wpmSlider.addEventListener("input", () => {
-    wpm = parseInt(wpmSlider.value, 10) || 300;
+    wpm = parseInt(wpmSlider.value, 10);
     wpmInput.value = wpm;
 });
 
 wpmInput.addEventListener("input", () => {
-    wpm = parseInt(wpmInput.value, 10) || 300;
+    wpm = parseInt(wpmInput.value, 10);
     wpmSlider.value = wpm;
 });
 
 sizeSlider.addEventListener("input", () => {
-    wordSize = parseInt(sizeSlider.value, 10) || 48;
+    wordSize = parseInt(sizeSlider.value, 10);
     updateDisplay();
 });
 
