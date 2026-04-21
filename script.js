@@ -49,22 +49,6 @@ const toggleInline = document.getElementById("toggleInline");
 const baseColorBtn = document.getElementById("baseColorBtn");
 const orpColorBtn = document.getElementById("orpColorBtn");
 
-const loadBtn = document.getElementById("loadBtn");
-const saveBtn = document.getElementById("saveBtn");
-
-
-//------------------------------------------------------------
-// LOAD / SAVE
-//------------------------------------------------------------
-loadBtn.addEventListener("click", () => {
-    inputText.value = localStorage.getItem("rsvp_text") || "";
-    prepareWords();
-});
-
-saveBtn.addEventListener("click", () => {
-    localStorage.setItem("rsvp_text", inputText.value || "");
-});
-
 
 //------------------------------------------------------------
 // WORD PREP
