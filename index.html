@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>RSVP Reader (Clean Build)</title>
+    <title>RSVP Reader</title>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -12,16 +12,18 @@
 
     <h1>RSVP Speed Reader</h1>
 
-    <textarea id="inputText" placeholder="Paste your text here, then press ▶ Play."></textarea>
+    <textarea id="inputText" placeholder="Paste text here..."></textarea>
 
     <div id="progressContainer">
         <div id="progressBar"></div>
     </div>
 
-    <!-- BIG WORD DISPLAY -->
+    <!-- BIG WORD DISPLAY WITH ORP COLUMNS -->
     <div id="bigWordContainer">
         <div id="bigWordInner">
-            <span id="bigWord"></span>
+            <span id="leftPart"></span>
+            <span id="orpPart"></span>
+            <span id="rightPart"></span>
         </div>
     </div>
 
@@ -34,7 +36,7 @@
         <h2>Settings</h2>
 
         <div class="settingsRow">
-            <label>WPM</label>
+            <label>Words Per Minute</label>
             <input type="range" id="wpmSlider" min="100" max="1000" value="300">
             <input type="number" id="wpmInput" value="300">
         </div>
@@ -45,11 +47,13 @@
         </div>
 
         <div class="settingsRow">
-            <label><input type="checkbox" id="toggleBig" checked> Show big word</label>
+            <label>Base Text Color</label>
+            <input type="color" id="baseColorPicker" value="#ffffff">
         </div>
 
         <div class="settingsRow">
-            <label><input type="checkbox" id="toggleInline" checked> Show inline context</label>
+            <label>ORP Letter Color</label>
+            <input type="color" id="orpColorPicker" value="#ff4444">
         </div>
 
     </div>
