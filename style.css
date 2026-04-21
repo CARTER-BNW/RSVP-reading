@@ -20,6 +20,7 @@ textarea {
     color: #fff;
     border: 1px solid #444;
     padding: 10px;
+    resize: vertical;
 }
 
 button {
